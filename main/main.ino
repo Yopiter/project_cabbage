@@ -33,6 +33,7 @@
 //Pins für ein LED-Display
 //Pin für eine Pumpe, die das Wasserbecken wieder auffüllt
 //Pins für Inputs (Potentiometer, Schalter oder Buttons)
+//Pin für Füllstandsmessung des Wasserbeckens
 //Pin für ein Heizelement
 //Pins für Status-LEDs
 //Pins für nerviges Piepen und Summen
@@ -46,9 +47,9 @@
 /////////////////
 
 ///////////////// Parameter
+#define DELAY_NORMAL 2000 //Wartezeit zwischen Zyklen
 #define LEGIT_TEMP_DIFF 4 //Maximale Temp-Diff zwischen Ein- und Ausgang
 #define MIN_MOISTURE 800 //Maximaler Widerstandswert der Hygrometer -> minimaler Feuchte-Zustand des Bodens
-
 
 /////////////////
 
@@ -56,12 +57,12 @@ dht DHT;
 void setup() {
   // put your setup code here, to run once:
   Serial.begin(9600);
-  Serial.println("DHT Test");
+  Serial.println("Ich beschwöre den magischen Schnittlauch!!");
 }
 
 void loop() {
   // put your main code here, to run repeatedly:
-  delay(2000);
+  delay(DELAY_NORMAL);
   int in = getTemperatur(DHTin);
   int out = getTemperatur(DHTout);
   //TODO: Prüfung der Temperaturunterschiede und der Durchschnittstemperatur

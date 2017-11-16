@@ -1,0 +1,196 @@
+Standard:
+
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+//Name des aktuellen Menupunktes
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+<         s e l e c t         >
+
+Menupunkte:
+
+Temperature
+Soil
+Fertilizer
+Status
+
+
+
+------------------------------------------------------------
+Temperature
+------------------------------------------------------------
+
+Ziel Temperatur (interne Standardabweichung 2 Grad
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+  T a r g e t   T e m p   ° C
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+  <       s e l e c t       >  
+
+//Standard Startwert immer 22 ° C der Einfachheit halber
+// -> Reasoning: Man kommt aus der Auswahl nur mit de mSetzen raus (derzeit) Wenn ein Spako 200°C Eingibt muss der vernünftige Admin das zurücktippen -> Standard wird nicht der aktueller Wert. Wenn ein dödel das verstellt und den aktuellen wert nicht kennt ist er dumm. (Evtl "select" lange drücken = reset auf Standardwert. Müsste man entscheiden (unabhänig vom nächsten Komment))
+// -> Vorschlag: Nach 2 sec Ohne Änderung aktuellen Wert in Klammern oder so ( blinken lassen in abwechslung mit dem einzustellenden Wert.
+// -> Halb-Grad-schritte
+
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+            2 4 . 0 ° C
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+  -       s e l e c t       +  
+
+----------------
+
+Zurück
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+            b a c k            
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+  <       s e l e c t       >  
+
+------------------------------------------------------------
+Soil
+------------------------------------------------------------
+
+Moisture Grenzen
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+    m i n   h u m i d i t y    
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+  <       s e l e c t       >  
+
+
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+    m a x   h u m i d i t y    
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+  <       s e l e c t       >  
+
+
+// Das wird für idioten schwer
+// Ich denke mal Startwerte min: 300 max: 500
+// 25er Schritte? da das ja hart eskaliert zwischen feucht und trocken und so ziemlich garnicht bei durchnässt und feucht, denke ich vlt ne logarithmysche skala?
+// Eventuell eine prozentuale Feuchte angeben anstelle eines Widerstandswertes?
+// Wieder das Einblinken der aktuellen Werte nach 2 sec?
+ 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+			3 0 0              
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+  -       s e l e c t       +  
+
+----------------
+
+Zurück
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+            b a c k            
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+  <       s e l e c t       >  
+
+
+
+------------------------------------------------------------
+Fertilizer
+------------------------------------------------------------
+
+Moisture Grenzen
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+  f e r t .   i n t e r v a l   
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+  <       s e l e c t       >  
+
+//Intervall in Tagen
+
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+		    4 d a y s              
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+  -       s e l e c t       +  
+
+----------------
+  
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+    f e r t .   v o l u m e    
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+  <       s e l e c t       >  
+
+// 5 ml pro Schritt bis minimal 0 und maximal 100 ml (Müssen wir dann noch an das Gesamtvolumen des kleinen Wassergefäßes anpassen!)
+// Muss intern umgerechnet werden in Sekunden Pumpdauer
+// Einblinken von Werten optional
+ 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+			3 0 m l              
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+  -       s e l e c t       +  
+
+----------------
+
+Zurück
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+            b a c k            
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+  <       s e l e c t       >  
+
+
+
+  
+------------------------------------------------------------
+Lighting
+------------------------------------------------------------
+
+Beleuchtungdauer
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+  L i g h t i n g   t i m e    
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+  <       s e l e c t       >  
+
+//30-Minuten-Schritte
+//Zwischen 8 und 20 h
+
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+		  1 2 . 5 h              
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+  -       s e l e c t       +  
+
+----------------
+
+Zurück
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+            b a c k            
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+  <       s e l e c t       >  
+
+
+
+
+------------------------------------------------------------
+Status
+------------------------------------------------------------
+
+temperature
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+a v g   t e m p e r a t u r e
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+  <       2 4 . 0 ° C       >  
+
+moisture
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+    a v g   m o i s t u r e            
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+  <          3 0 0         >  
+
+last watering
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+  l a s t   w a t e r i n g    
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+  <     % % 2 0   m i n     >  
+
+last fertilizer
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+l a s t   f e r t i l i z e r
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+  <       % % 2   h         >  
+
+lighting time
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+r e m a i n i n g   l i g h t
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+  <       % % 2   h         >  
+----------------
+
+Zurück
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+            b a c k            
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+  <       s e l e c t       >  
+
