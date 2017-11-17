@@ -55,12 +55,13 @@
 /////////////////
 
 dht DHT;
-int moistures[4];
-int temperature;
-int fertPumpTime;
-int fertFreq;
-int fertZyklenRemaining;
-
+unsigned int moistures[4];
+unsigned int temperature;
+unsigned int fertPumpTime;
+unsigned long fertFreq;
+unsigned int fertZyklenRemaining;
+unsigned long lichtDauer;
+unsigned int lichtZyklenRemaining;
 
 void setup() {
   // put your setup code here, to run once:
@@ -86,8 +87,14 @@ bool initStandardValues() {
   moistures[0] = moistures[1] = moistures[2] = moistures[3] = 10; //I am ashamed of this...
   temperature = 22;
   fertPumpTime = 10;
-  fertFreq = 7;
-  fertZyklenRemaining = (int)fertFreq * 24 * 60 * 60 / DELAY_NORMAL * 1000;
+  fertFreq = 7 * 24 * 60 * 60L;
+  fertZyklenRemaining = sekundenZuZyklen(fertFreq);
+  lichtDauer = 12 * 60 * 60L;
+  lichtZyklenRemaining =sekundenZuZyklen(lichtDauer);
+}
+
+int sekundenZuZyklen(int Sekunden) {
+  return (int) Sekunden / DELAY_NORMAL * 1000;
 }
 
 int getTemperatur(int pin) {
