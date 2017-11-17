@@ -27,10 +27,10 @@
 
 #define Vent 3
 /////////////////
-//Zusammengefasst: 4 analoge Pins und 8 digitale Pins belegt. 4 analoge und 4 digitale Pins noch frei. (Wenn man die SPezialpins mal ignoriert)
-//Bei Bedarf für kleinere Ausgabereihen (Stataus-LEDs etc.) kann mittels Shift-Register erweitert werden (Habe ich noch welche da)
+//Zusammengefasst: 4 analoge Pins und 10 digitale Pins belegt. 4 analoge und 4 digitale Pins noch frei. (Wenn man die Spezialpins mal ignoriert)
+//Bei Bedarf für kleinere Ausgabereihen (Status-LEDs etc.) kann mittels Shift-Register erweitert werden (Habe ich noch welche da)
 //Eventuell noch nötig:
-//Pins für ein LED-Display
+//Pins für ein LED-Display (Benötigt 6 Pins)
 //Pin für eine Pumpe, die das Wasserbecken wieder auffüllt
 //Pins für Inputs (Potentiometer, Schalter oder Buttons)
 //Pin für Füllstandsmessung des Wasserbeckens
@@ -42,7 +42,7 @@
 ///////////////// Fehlerzustände
 #define DHT_TIMEOUT 0
 #define DHT_CHECKSUM 1
-
+#define MOISTURE_WARNING 2
 
 /////////////////
 
@@ -50,10 +50,18 @@
 #define DELAY_NORMAL 2000 //Wartezeit zwischen Zyklen
 #define LEGIT_TEMP_DIFF 4 //Maximale Temp-Diff zwischen Ein- und Ausgang
 #define MIN_MOISTURE 800 //Maximaler Widerstandswert der Hygrometer -> minimaler Feuchte-Zustand des Bodens
+#define MAX_MOISTURE 300 //Minimnaler Widerstandswert, dann Warnung
 
 /////////////////
 
 dht DHT;
+int moistures[4];
+int temperature;
+int fertPumpTime;
+int fertFreq;
+int fertZyklenRemaining;
+
+
 void setup() {
   // put your setup code here, to run once:
   Serial.begin(9600);
@@ -72,6 +80,14 @@ void loop() {
   //Prüfung der Feuchte eventuell auch nicht bei jedem Zyklus
   //GROßES TODO: Planen, wie man die Bedienung realisieren könnte:
   //Nötig sind Eingaben für Temperatur, Belichtungszeit, 4 x Bodenfeuchtewerte und eventuell für Düngerzugabe
+}
+
+bool initStandardValues() {
+  moistures[0] = moistures[1] = moistures[2] = moistures[3] = 10; //I am ashamed of this...
+  temperature = 22;
+  fertPumpTime = 10;
+  fertFreq = 7;
+  fertZyklenRemaining = (int)fertFreq * 24 * 60 * 60 / DELAY_NORMAL * 1000;
 }
 
 int getTemperatur(int pin) {
@@ -103,9 +119,13 @@ int getTemperatur(int pin) {
 bool Fehler(int Identifier, String meldung) {
   switch (Identifier) {
     case (DHT_TIMEOUT):
-      Serial.print("DHT-Sensor Timed out at ");
-      Serial.print(millis()); //Wtf, der Versuch das in eine Zeile zu packen ist einfach mal harte abgelehnt wurden...
-      Serial.print(": " + meldung + "\n");
+      char Nachricht[25];
+      sprintf(Nachricht, "DHT-Sensor Timed out at %d: ", millis());
+      Anzeigen(Nachricht + meldung);
+      break;
+    case (MOISTURE_WARNING):
+      break;
+    case (DHT_CHECKSUM):
       break;
     //TODO: Für weitere Fehlerfälle anpassen
     default:
@@ -115,11 +135,16 @@ bool Fehler(int Identifier, String meldung) {
   }
 }
 
-bool Anzeigen(String Text) {
-  //TODO: Entscheidung, ob über Serial oder über LCD
+int getMoisture(int pin) {
+  int sensorResistance = analogRead(pin);
+  if (sensorResistance < MAX_MOISTURE || sensorResistance > MIN_MOISTURE) {
+    Fehler(MOISTURE_WARNING, "Pin " + pin);
+  }
+  sensorResistance = constrain(sensorResistance, MAX_MOISTURE, MIN_MOISTURE);
+  return map(sensorResistance, MAX_MOISTURE, MIN_MOISTURE, 100, 0);
 }
 
-int getMoisture(int pin) {
-  //TODO: ....... Schamlos aus dem oben verlinkten Tutorial Code klauen XD
+bool Anzeigen(String Text) {
+  //TODO: Entscheidung, ob über Serial oder über LCD
 }
 
