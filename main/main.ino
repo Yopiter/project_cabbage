@@ -55,12 +55,12 @@
 /////////////////
 
 dht DHT;
-unsigned int moistures[4];
+unsigned int moistures[4]; //Bodenfeuchte in % //Vielleicht lieber als Widerstandswert speichern?
 unsigned int temperature;
 unsigned int fertPumpTime;
-unsigned long fertFreq;
+unsigned long fertFreq; //in Sekunden
 unsigned int fertZyklenRemaining;
-unsigned long lichtDauer;
+unsigned long lichtDauer; //in Sekunden
 unsigned int lichtZyklenRemaining;
 
 void setup() {
@@ -90,7 +90,7 @@ bool initStandardValues() {
   fertFreq = 7 * 24 * 60 * 60L;
   fertZyklenRemaining = sekundenZuZyklen(fertFreq);
   lichtDauer = 12 * 60 * 60L;
-  lichtZyklenRemaining =sekundenZuZyklen(lichtDauer);
+  lichtZyklenRemaining = sekundenZuZyklen(lichtDauer);
 }
 
 int sekundenZuZyklen(int Sekunden) {
