@@ -60,15 +60,15 @@ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
 
 
 // Das wird für idioten schwer
-// Ich denke mal Startwerte min: 300 max: 500
-// 25er Schritte? da das ja hart eskaliert zwischen feucht und trocken und so ziemlich garnicht bei durchnässt und feucht, denke ich vlt ne logarithmysche skala?
-// Eventuell eine prozentuale Feuchte angeben anstelle eines Widerstandswertes?
-// Wieder das Einblinken der aktuellen Werte nach 2 sec?
+// Ich denke mal Startwerte min: 600 max: 300
+// mmin ist der Trigger fürs pumpen. Wir mmüssen mal (experimentell) nach einer Formel suchen um vom Trigger auf einen variablen Targetwert zu kommen
+// Eventuell eine prozentuale Feuchte angeben anstelle eines Widerstandswertes? Oder so rum..
+// Wieder das Einblinken der aktuellen Werte nach 2 sec? Ja
  
-_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
-			3 0 0              
-_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
-  -       s e l e c t       +  
+    _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+                3 0 0              
+    _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+      -       s e l e c t       +  
 
 ----------------
 
@@ -84,7 +84,7 @@ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
 Fertilizer
 ------------------------------------------------------------
 
-Moisture Grenzen
+Dünger Intervall 
 _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
   f e r t .   i n t e r v a l   
 _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
@@ -92,10 +92,10 @@ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
 
 //Intervall in Tagen
 
-_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
-		    4 d a y s              
-_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
-  -       s e l e c t       +  
+    _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+                4 d a y s              
+    _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+      -       s e l e c t       +  
 
 ----------------
   
@@ -108,10 +108,10 @@ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
 // Muss intern umgerechnet werden in Sekunden Pumpdauer
 // Einblinken von Werten optional
  
-_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
-			3 0 m l              
-_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
-  -       s e l e c t       +  
+    _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+                3 0 m l              
+    _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+      -       s e l e c t       +  
 
 ----------------
 
@@ -136,11 +136,13 @@ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
 
 //30-Minuten-Schritte
 //Zwischen 8 und 20 h
+// Willst du evtl. auch Nachtzeit machen? Sodass man bei nem Zyklus der nicht 24h ist rauskommen kann?
+// Dann könnte man (weiß nicht ob man das braucht) auch eine art que von hell und dunkel machen.
 
-_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
-		  1 2 . 5 h              
-_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
-  -       s e l e c t       +  
+    _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+            1 2 . 5 h              
+    _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+      -       s e l e c t       +  
 
 ----------------
 
