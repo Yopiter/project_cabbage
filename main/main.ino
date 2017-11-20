@@ -82,8 +82,7 @@ void setup() {
 }
 
 void loop() {
-  if(!userMode){
-  delay(DELAY_NORMAL);
+
   int in = getTemperatur(DHTin);
   int out = getTemperatur(DHTout);
   //TODO: Prüfung der Temperaturunterschiede und der Durchschnittstemperatur
@@ -91,22 +90,23 @@ void loop() {
   //Wenn gegeben auch Heizelement regeln
   //Dann Prüfung der Bodenfeuchten und bei Bedarf betätigen der Pumpen
   //Prüfung der Feuchte eventuell auch nicht bei jedem Zyklus
-  //GROßES TODO: Planen, wie man die Bedienung realisieren könnte:
-  //Nötig sind Eingaben für Temperatur, Belichtungszeit, 4 x Bodenfeuchtewerte und eventuell für Düngerzugabe
+  if (!userMode) {
+    delay(DELAY_NORMAL);
+    //Counter zählen lassen
   }
-  else{
+  else {
     delay(DELAY_USER_MODE);
-    if(engageUserMode()){
+    if (engageUserMode()) {
       //Alles fit im Schritt, geht okidoki weiter
       //Vielleicht etwas Musik spielen
     }
-    else{
+    else {
       //Usermode wurde beendet
       //Display ausschalten
     }
+    //Eventuelle Counter weiterlaufen lassen, aber nur weniger Zeit abziehen
+    //Bei den Countern in Zyklen nur jedes zehnte Mal einen abziehen oder es einfach lassen, macht nix
   }
-  //Eventuelle Counter weiterlaufen lassen, aber nur weniger Zeit abziehen
-  //Bei den Countern in Zyklen nur jedes zehnte Mal einen abziehen oder es einfach lassen, bei Tages-Intervallen macht das auch nix mehr aus
 }
 
 bool initStandardValues() {
