@@ -178,7 +178,3 @@ bool tempInRange(int Temp) {
   return Temp < MAX_TEMP && Temp > MIN_TEMP;
 }
 
-bool Anzeigen(String Text) {
-  //TODO: Entscheidung, ob über Serial oder über LCD
-}
-
