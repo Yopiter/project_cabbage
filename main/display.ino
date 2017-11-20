@@ -1,9 +1,3 @@
-#include <stdio.h> //sprintf
-
-using namespace std;
-
-//Auslesefunktionen der Pins in ein Headerfile "Schnittstelle"
-
 int Levelshit[][3] = {{6, 7}, {8, 9, 7}, {11, 12, 7} }; // manövrieren mit ner grenze der tiefe des ersten arrays, bei click gehts in die untere ebene und man weiß fürs zurück noch welches das oberstück ist.
 //7 wäre der zurück text
 
@@ -12,13 +6,18 @@ char descriptions[][17] = {"" }; //Liste aller Texte in der ersten Zeile-> Stell
 char thirdLayerBottom[17] = " -   select   + "; //Standard-Text für 3. Ebene Zeile 2
 char specialBottom[17];
 
+int topPos = 0;
+bool second = false;
+int secPos = 0;
+bool third = false;
+
 int custBots[][2] = {{7, 0}, {10, 1}, {14, 2}, {16, 3}, {17, 4}, {20, 5}, {21, 5}, {22, 5}};
 
 int functioncall () { //Beipielfunktion für Messungen
   return 2;
 }
 
-void custBottom(int id) {
+void getBottom(int id) {
   char output[17];
   switch (id)
   {
@@ -37,19 +36,13 @@ void custBottom(int id) {
     case 4: //verbleibendes Licht
       sprintf(output, " <   %3d h    > ", functioncall());
       break;
+    default:
+      copy(thirdLayerBottom, output, 17);
+      break;
   }
-  for (int cnt = 0; cnt <= sizeof(output) / sizeof(*output) - 1; cnt++)
-  {
-    specialBottom[cnt] = output[cnt];
-  }
-
+  copy(output, specialBottom, 17);
 }
 
-int main ()
-{
-  int topPos = 0;
-  bool second = false;
-  int secPos = 0;
-  bool third = false;
+void copy(char* src, char* dst, int len) {
+  memcpy(dst, src, sizeof(src[0])*len);
 }
-
