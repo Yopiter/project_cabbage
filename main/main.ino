@@ -175,7 +175,3 @@ int readButtons() {
   return -1;
 }
 
-bool Anzeigen(String Text) {
-  //TODO: Entscheidung, ob über Serial oder über LCD
-}
-
