@@ -9,7 +9,7 @@ int secPos = 0;
 bool third = false;
 long standardTimeouts[2] = {10000, 60000};
 long idleTime = 0;
-int stepTime = 200; //Time beetween checks
+bool userMode = false;
 
 int custBots[][2] = {{7, 0}, {10, 1}, {14, 2}, {16, 3}, {17, 4}};
 
@@ -51,130 +51,134 @@ void copy(char* src, char* dst, int len) {
   memcpy(dst, src, sizeof(src[0])*len);
 }
 
-void EngageUserMode() {
-  while ((third && idleTime > standardTimeouts[1]) | (!third && idleTime > standardTimeouts[0])) {
-    //Display
-    if (!third)
+bool EngageUserMode() {
+  if ((third && idleTime > standardTimeouts[1]) | (!third && idleTime > standardTimeouts[0])) {
+    userMode=false; //Timeout: UserMode beenden und das auch der Loop-funktion sagen
+    return false;
+  }
+  //Display
+  if (!third)
+  {
+
+    //First Level Display is always the standard bot text
+    if (!second)
     {
-      
-      //First Level Display is always the standard bot text
-      if (!second)
-      {
-        char botText[17];
-        getBottom(5, botText);
-        PrintShit(descriptions[topPos], botText); //TODO Testen
-      }
-      
-      //Second Level Displays need to look for special cases (Status messages)
-      else
-      {
-        int descPos = Levelshit[topPos][secPos];
-        int specialCase = -1;
-        for (int cnt = 0; cnt < (sizeof(custBots)/sizeof(custBots[0])); cnt++) { //TODO gibts hier nen Stackoverflow?
-          if (custBots[cnt][0] == descPos)
-          {
-            specialCase = cnt;
-            break;
-          }
-        }
-
-        char botText[17];
-        if (specialCase >= 0)
-          getBottom(custBots[specialCase][1], botText);
-        else
-          getBottom(5, botText);
-
-        PrintShit(descriptions[descPos], botText);
-      }
+      char botText[17];
+      getBottom(5, botText);
+      PrintShit(descriptions[topPos], botText); //TODO Testen
     }
-    //Third Layer Display shit, still need to figure this out
+
+    //Second Level Displays need to look for special cases (Status messages)
     else
     {
-      // Man könnte die betreffenden Variablen in ein Array "clonen" dass den Zahlen der SwitchCases gleicht -> hier die idleTime Mod 2000 und dann ein True / false senden -> gibt den Wechsel
+      int descPos = Levelshit[topPos][secPos];
+      int specialCase = -1;
+      for (int cnt = 0; cnt < (sizeof(custBots) / sizeof(custBots[0])); cnt++) { //TODO gibts hier nen Stackoverflow?
+        if (custBots[cnt][0] == descPos)
+        {
+          specialCase = cnt;
+          break;
+        }
+      }
+
       char botText[17];
-      getBottom(911, botText);
-      PrintShit(botText , botText); //TODO provisorischer topText -> Lösung finden
+      if (specialCase >= 0)
+        getBottom(custBots[specialCase][1], botText);
+      else
+        getBottom(5, botText);
+
+      PrintShit(descriptions[descPos], botText);
+    }
+  }
+  //Third Layer Display shit, still need to figure this out
+  else
+  {
+    // Man könnte die betreffenden Variablen in ein Array "clonen" dass den Zahlen der SwitchCases gleicht -> hier die idleTime Mod 2000 und dann ein True / false senden -> gibt den Wechsel
+    char botText[17];
+    getBottom(911, botText);
+    PrintShit(botText , botText); //TODO provisorischer topText -> Lösung finden
+  }
+
+
+  //Interaction logic
+  int button = readButtons();
+
+  if (button == -1)
+    idleTime += DELAY_USER_MODE;
+  return false;
+  else {
+    idleTime = 0; //Button pressed -> Idle Timer reset
+
+    // Select gedrückt
+    if (button == 1) {
+      if (!second) { //Do first LAyer stuff -> entering second layer
+        second = true;
+      }
+      else if (!third) { // Do second level Possibilities
+        if (Levelshit[topPos][secPos] == 7) { //go back
+          second = false;
+          secPos = 0;
+        }
+        else {
+          int descPos = Levelshit[topPos][secPos];
+          bool special = false;
+          for (int cnt = 0; cnt < (sizeof(custBots) / sizeof(custBots[0])); cnt++) { //TODO gibts hier nen Stackoverflow?
+            if (custBots[cnt][0] == descPos)
+            {
+              special = true;
+              break;
+            }
+          }
+
+          //Do nothing when special (observing value) and go to setting Values (3rd layer) the rest of the time
+          if (!special) {
+            //TODO third level magic
+            third = true;
+          }
+        }
+      }
+      else {
+        //TODO set value
+        third = false;
+      }
     }
 
-  
-    //Interaction logic  
-    int button = readButtons()
-
-    if (button == -1)
-      idleTime += stepTime;
-    else {
-      idleTime = 0; //Button pressed -> Idle Timer reset
-      
-      // Select gedrückt
-      if (button == 1) {
-        if (!second) { //Do first LAyer stuff -> entering second layer
-          second = true;
-        }
-        else if (!third) { // Do second level Possibilities
-          if (Levelshit[topPos][secPos] == 7) { //go back
-            second = false;
-            secPos = 0;
-          }
-          else {
-            int descPos = Levelshit[topPos][secPos];
-            bool special = false;
-            for (int cnt = 0; cnt < (sizeof(custBots)/sizeof(custBots[0])); cnt++) { //TODO gibts hier nen Stackoverflow?
-              if (custBots[cnt][0] == descPos)
-              {
-                special = true;
-                break;
-              }
-            }
-
-            //Do nothing when special (observing value) and go to setting Values (3rd layer) the rest of the time
-            if (!special) { 
-              //TODO third level magic
-              third = true;
-            }
-          }
-        }
-        else {
-          //TODO set value
-          third = false; 
-        }
+    //left gedrückt
+    if (button == 0) {
+      if (!second) {
+        topPos -= 1;
+        topPos = (topPos == -1) ? 4 : topPos; //TODO aufpassen, dass es angepasst wird, bei änderungen von Levelshit
       }
-
-      //left gedrückt
-      if (button == 0) {
-        if (!second) {
-          topPos -= 1;
-          topPos = (topPos == -1) ? 4 : topPos; //TODO aufpassen, dass es angepasst wird, bei änderungen von Levelshit
-        }
-        else if (!third) {
-          secPos -= 1;
-          secPos = (secPos == -1) ? (sizeof(Levelshit[topPos])/sizeof(Levelshit[topPos][0]))-1 : secPos;
-        }
-        else {
-          //TODO third level Magic
-          
-        }
+      else if (!third) {
+        secPos -= 1;
+        secPos = (secPos == -1) ? (sizeof(Levelshit[topPos]) / sizeof(Levelshit[topPos][0])) - 1 : secPos;
       }
+      else {
+        //TODO third level Magic
 
-      //right gedrückt
-      if (button == 2) {
-        if (!second) {
-          topPos += 1;
-          topPos = (topPos >= 5) ? 0 : topPos; //TODO aufpassen, dass es angepasst wird, bei änderungen von Levelshit
-        }
-        else if (!third) {
-          secPos += 1;
-          secPos = (secPos >= sizeof(Levelshit[topPos])/sizeof(Levelshit[topPos][0])) ? 0 : secPos;
-        }
-        else {
-          //TODO third level Magic
-          
-        }
       }
     }
+
+    //right gedrückt
+    if (button == 2) {
+      if (!second) {
+        topPos += 1;
+        topPos = (topPos >= 5) ? 0 : topPos; //TODO aufpassen, dass es angepasst wird, bei änderungen von Levelshit
+      }
+      else if (!third) {
+        secPos += 1;
+        secPos = (secPos >= sizeof(Levelshit[topPos]) / sizeof(Levelshit[topPos][0])) ? 0 : secPos;
+      }
+      else {
+        //TODO third level Magic
+
+      }
+    }
+    return true;
   }
 }
 
 void PrintShit(char * topText, char * botText) {
-  
+
 }
 
