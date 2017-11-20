@@ -1,20 +1,20 @@
 #include <stdio.h> //sprintf
- 
+
 using namespace std;
 
 //Auslesefunktionen der Pins in ein Headerfile "Schnittstelle"
 
-int Levelshit[][3] = {{6,7}, {8,9,7}, {11,12,7} }; // manövrieren mit ner grenze der tiefe des ersten arrays bei click gehts in die untere ebene und man weiß fürs zurück noch welches das oberstück ist. Für die 3. Ebene hab ich kp ehrlich :/ vlt wieder hart coden wie beim custBottom()
+int Levelshit[][3] = {{6, 7}, {8, 9, 7}, {11, 12, 7} }; // manövrieren mit ner grenze der tiefe des ersten arrays, bei click gehts in die untere ebene und man weiß fürs zurück noch welches das oberstück ist.
 //7 wäre der zurück text
 
 char standardBottom[17] = " <   select   > "; //wenn custBot.find(id) nicht true oder so, dann das hier nehmen
-char descriptions[][17] = {"" }; //Liste aller oberen Texte -> Stelle im Array = id in anderen arrays / maps
-char thirdLayerBottom[17] = " -   select   + ";
+char descriptions[][17] = {"" }; //Liste aller Texte in der ersten Zeile-> Stelle im Array = id in anderen arrays / maps
+char thirdLayerBottom[17] = " -   select   + "; //Standard-Text für 3. Ebene Zeile 2
 char specialBottom[17];
 
-int custBots[][2] = {{7,0},{10,1},{14,2},{16,3},{17,4},{20,5},{21,5},{22,5}}; 
-int functioncall ()
-{
+int custBots[][2] = {{7, 0}, {10, 1}, {14, 2}, {16, 3}, {17, 4}, {20, 5}, {21, 5}, {22, 5}};
+
+int functioncall () { //Beipielfunktion für Messungen
   return 2;
 }
 
@@ -38,19 +38,18 @@ void custBottom(int id) {
       sprintf(output, " <   %3d h    > ", functioncall());
       break;
   }
-  for (int cnt = 0; cnt <= sizeof(output)/sizeof(*output)-1; cnt++)
+  for (int cnt = 0; cnt <= sizeof(output) / sizeof(*output) - 1; cnt++)
   {
     specialBottom[cnt] = output[cnt];
   }
-    
+
 }
 
-int main () 
+int main ()
 {
   int topPos = 0;
   bool second = false;
   int secPos = 0;
   bool third = false;
-  
 }
 

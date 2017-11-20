@@ -1,4 +1,4 @@
-Standard:
+﻿Standard:
 
 _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
 //Name des aktuellen Menupunktes
@@ -10,7 +10,7 @@ Menupunkte:
 Temperature
 Soil
 Fertilizer
-Lightning
+Lighting
 Status
 
 
