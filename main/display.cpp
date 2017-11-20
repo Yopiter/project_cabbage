@@ -7,9 +7,10 @@ using namespace std;
 int Levelshit[][3] = {{6,7}, {8,9,7}, {11,12,7} }; // manövrieren mit ner grenze der tiefe des ersten arrays bei click gehts in die untere ebene und man weiß fürs zurück noch welches das oberstück ist. Für die 3. Ebene hab ich kp ehrlich :/ vlt wieder hart coden wie beim custBottom()
 //7 wäre der zurück text
 
-char standardBottom[] = " <   select   > "; //wenn custBot.find(id) nicht true oder so, dann das hier nehmen
+char standardBottom[17] = " <   select   > "; //wenn custBot.find(id) nicht true oder so, dann das hier nehmen
 char descriptions[][17] = {"" }; //Liste aller oberen Texte -> Stelle im Array = id in anderen arrays / maps
-char currentBottom[17];
+char thirdLayerBottom[17] = " -   select   + ";
+char specialBottom[17];
 
 int custBots[][2] = {{7,0},{10,1},{14,2},{16,3},{17,4},{20,5},{21,5},{22,5}}; 
 int functioncall ()
@@ -36,9 +37,20 @@ void custBottom(int id) {
     case 4: //verbleibendes Licht
       sprintf(output, " <   %3d h    > ", functioncall());
       break;
-    case 5: //- + texte
-      output [17] = " -   select   + ";
-      break;
   }
-  currentBottom[17] = output;
+  for (int cnt = 0; cnt <= sizeof(output)/sizeof(*output)-1; cnt++)
+  {
+    specialBottom[cnt] = output[cnt];
+  }
+    
 }
+
+int main () 
+{
+  int topPos = 0;
+  bool second = false;
+  int secPos = 0;
+  bool third = false;
+  
+}
+
