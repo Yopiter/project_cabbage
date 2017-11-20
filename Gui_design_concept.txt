@@ -10,6 +10,7 @@ Menupunkte:
 Temperature
 Soil
 Fertilizer
+Lightning
 Status
 
 
@@ -169,7 +170,7 @@ moisture
 _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
     a v g   m o i s t u r e            
 _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
-  <          3 0 0         >  
+  <           3 0 0         >   
 
 last watering
 _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
