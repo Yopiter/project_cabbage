@@ -24,8 +24,12 @@
 #define PumdFert 2
 
 //Pin für Ventilator //Ebenfalls über Relais/Transistor mit eigener Versorgung //Benötigt PWM-fähigen Digital-Pin
-
 #define Vent 3
+
+//Pins für Buttons
+#define ButtonLinks 4
+#define ButtonMitte 5
+#define ButtonRechts 6
 /////////////////
 //Zusammengefasst: 4 analoge Pins und 10 digitale Pins belegt. 4 analoge und 4 digitale Pins noch frei. (Wenn man die Spezialpins mal ignoriert)
 //Bei Bedarf für kleinere Ausgabereihen (Status-LEDs etc.) kann mittels Shift-Register erweitert werden (Habe ich noch welche da)
@@ -54,6 +58,10 @@
 
 /////////////////
 
+int ButtonPins[3] = {ButtonLinks, ButtonMitte, ButtonRechts};
+
+/////////////////
+
 dht DHT;
 unsigned int moistures[4]; //Bodenfeuchte in % //Vielleicht lieber als Widerstandswert speichern?
 unsigned int temperature;
@@ -63,8 +71,11 @@ unsigned int fertZyklenRemaining;
 unsigned long lichtDauer; //in Sekunden
 unsigned int lichtZyklenRemaining;
 
+/////////////////
+
+
 void setup() {
-  // put your setup code here, to run once:
+  initiateButtons();
   Serial.begin(9600);
   Serial.println("Ich beschwöre den magischen Schnittlauch!!");
 }
@@ -149,6 +160,19 @@ int getMoisture(int pin) {
   }
   sensorResistance = constrain(sensorResistance, MAX_MOISTURE, MIN_MOISTURE);
   return map(sensorResistance, MAX_MOISTURE, MIN_MOISTURE, 100, 0);
+}
+
+void initiateButtons() {
+  for (int i = 0; i < sizeof(ButtonPins) / sizeof(int); i++) {
+    pinMode(ButtonPins[i], INPUT);
+  }
+}
+
+int readButtons() {
+  for (int i = 0; i < sizeof(ButtonPins) / sizeof(int); i++) {
+    if (digitalRead(ButtonPins[i]) == HIGH) return i;
+  }
+  return -1;
 }
 
 bool Anzeigen(String Text) {
