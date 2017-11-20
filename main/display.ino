@@ -1,10 +1,7 @@
 int Levelshit[][3] = {{6, 7}, {8, 9, 7}, {11, 12, 7} }; // manövrieren mit ner grenze der tiefe des ersten arrays, bei click gehts in die untere ebene und man weiß fürs zurück noch welches das oberstück ist.
 //7 wäre der zurück text
 
-char standardBottom[17] = " <   select   > "; //wenn custBot.find(id) nicht true oder so, dann das hier nehmen
 char descriptions[][17] = {"" }; //Liste aller Texte in der ersten Zeile-> Stelle im Array = id in anderen arrays / maps
-char thirdLayerBottom[17] = " -   select   + "; //Standard-Text für 3. Ebene Zeile 2
-char specialBottom[17];
 
 int topPos = 0;
 bool second = false;
@@ -17,7 +14,9 @@ int functioncall () { //Beipielfunktion für Messungen
   return 2;
 }
 
-void getBottom(int id) {
+void getBottom(int id, char botBuffer[17]) {
+  char standardBottom[17] = " <   select   > "; //wenn custBot.find(id) nicht true oder so, dann das hier nehmen
+  char thirdLayerBottom[17] = " -   select   + "; //Standard-Text für 3. Ebene Zeile 2
   char output[17];
   switch (id)
   {
@@ -36,11 +35,13 @@ void getBottom(int id) {
     case 4: //verbleibendes Licht
       sprintf(output, " <   %3d h    > ", functioncall());
       break;
+    case 5:
+      copy(standardBottom, output, 17);
     default:
       copy(thirdLayerBottom, output, 17);
       break;
   }
-  copy(output, specialBottom, 17);
+  copy(output, botBuffer, 17);
 }
 
 void copy(char* src, char* dst, int len) {
