@@ -59,6 +59,7 @@
 
 ///////////////// Parameter
 #define DELAY_NORMAL 2000 //Wartezeit zwischen Zyklen
+#define DELAY_USER_MODE 200 //Abfragetakt der Buttons und der Ausgabe
 #define LEGIT_TEMP_DIFF 4 //Maximale Temp-Diff zwischen Ein- und Ausgang
 #define MIN_MOISTURE 700 //Maximaler Widerstandswert der Hygrometer -> minimaler Feuchte-Zustand des Bodens
 #define MAX_MOISTURE 280 //Minimnaler Widerstandswert, dann Warnung
@@ -102,7 +103,7 @@ void setup() {
 }
 
 void loop() {
-  // put your main code here, to run repeatedly:
+  if(!userMode){
   delay(DELAY_NORMAL);
   if (!handleTemperaturen(getTemperatur(DHTin), getTemperatur(DHTout))) {
     Fehler(TEMP_HANDLING_ERROR, "Zu kalt, aber auch schlecht durchlüftet!");
@@ -111,6 +112,20 @@ void loop() {
   handleBodenFeuchten();
   //GROßES TODO: Planen, wie man die Bedienung realisieren könnte:
   //Nötig sind Eingaben für Temperatur, Belichtungszeit, 4 x Bodenfeuchtewerte und eventuell für Düngerzugabe
+  }
+  else{
+    delay(DELAY_USER_MODE);
+    if(engageUserMode()){
+      //Alles fit im Schritt, geht okidoki weiter
+      //Vielleicht etwas Musik spielen
+    }
+    else{
+      //Usermode wurde beendet
+      //Display ausschalten
+    }
+  }
+  //Eventuelle Counter weiterlaufen lassen, aber nur weniger Zeit abziehen
+  //Bei den Countern in Zyklen nur jedes zehnte Mal einen abziehen oder es einfach lassen, bei Tages-Intervallen macht das auch nix mehr aus
 }
 
 bool initStandardValues() {
