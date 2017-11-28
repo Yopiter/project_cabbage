@@ -51,6 +51,7 @@
 
 ///////////////// Parameter
 #define DELAY_NORMAL 2000 //Wartezeit zwischen Zyklen
+#define DELAY_USER_MODE 200 //Abfragetakt der Buttons und der Ausgabe
 #define LEGIT_TEMP_DIFF 4 //Maximale Temp-Diff zwischen Ein- und Ausgang
 #define MIN_MOISTURE 700 //Maximaler Widerstandswert der Hygrometer -> minimaler Feuchte-Zustand des Bodens
 #define MAX_MOISTURE 280 //Minimnaler Widerstandswert, dann Warnung
@@ -81,8 +82,7 @@ void setup() {
 }
 
 void loop() {
-  // put your main code here, to run repeatedly:
-  delay(DELAY_NORMAL);
+
   int in = getTemperatur(DHTin);
   int out = getTemperatur(DHTout);
   //TODO: Prüfung der Temperaturunterschiede und der Durchschnittstemperatur
@@ -90,8 +90,23 @@ void loop() {
   //Wenn gegeben auch Heizelement regeln
   //Dann Prüfung der Bodenfeuchten und bei Bedarf betätigen der Pumpen
   //Prüfung der Feuchte eventuell auch nicht bei jedem Zyklus
-  //GROßES TODO: Planen, wie man die Bedienung realisieren könnte:
-  //Nötig sind Eingaben für Temperatur, Belichtungszeit, 4 x Bodenfeuchtewerte und eventuell für Düngerzugabe
+  if (!userMode) {
+    delay(DELAY_NORMAL);
+    //Counter zählen lassen
+  }
+  else {
+    delay(DELAY_USER_MODE);
+    if (engageUserMode()) {
+      //Alles fit im Schritt, geht okidoki weiter
+      //Vielleicht etwas Musik spielen
+    }
+    else {
+      //Usermode wurde beendet
+      //Display ausschalten
+    }
+    //Eventuelle Counter weiterlaufen lassen, aber nur weniger Zeit abziehen
+    //Bei den Countern in Zyklen nur jedes zehnte Mal einen abziehen oder es einfach lassen, macht nix
+  }
 }
 
 bool initStandardValues() {
@@ -176,9 +191,5 @@ int readButtons() {
   
 bool tempInRange(int Temp) {
   return Temp < MAX_TEMP && Temp > MIN_TEMP;
-}
-
-bool Anzeigen(String Text) {
-  //TODO: Entscheidung, ob über Serial oder über LCD
 }
 
