@@ -1,4 +1,4 @@
-int pumpenZustand[8];
+int pumpenZustand[8] = {0, 0, 0, 0, 0, 0, 0, 0};
 
 void DoPumpThings(int PumpenNummer, int Zustand = -1) {
   switch (Zustand) {

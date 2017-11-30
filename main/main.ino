@@ -107,6 +107,9 @@ bool initStandardValues() {
   fertZyklenRemaining = sekundenZuZyklen(fertFreq);
   lichtDauer = 12 * 60 * 60L;
   lichtZyklenRemaining = sekundenZuZyklen(lichtDauer);
+
+  //Pumpen
+  WritePumpValues();
 }
 
 int sekundenZuZyklen(int Sekunden) {
