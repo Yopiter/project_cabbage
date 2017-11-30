@@ -13,12 +13,17 @@
 #define Hyg2 A2
 #define Hyg3 A3
 
-//Pins für Pumpen //4 Pumpen zur Bewässerung //Magnetventile wären cooler, kostet aber mehr als 2~3 kleine Pumpen...
+//Pins für Shift Register
+#define DataPin 10
+#define ClockPin 11
+#define LatchPin 12
+
+//Pins auf Shift-Register //4 Pumpen zur Bewässerung
 //Pumpen werden entweder über Relay oder über Transistor angesteuert, haben eine eigene externe Stromversorgung mit 12 V
-#define Pump0 10 //Pumpe für Gebiet 0
-#define Pump1 11
-#define Pump2 12
-#define Pump3 13 //Eventuell hängt da die Board-LED dran, das könnte ein bisschen nerven
+#define Pump0 0 //Pumpe für Gebiet 0
+#define Pump1 1
+#define Pump2 2
+#define Pump3 3
 
 //Pin für eine eventuelle Düngerpumpe, die das Frischwasser mit Dünger spiken würde
 #define PumdFert 2
@@ -102,6 +107,9 @@ bool initStandardValues() {
   fertZyklenRemaining = sekundenZuZyklen(fertFreq);
   lichtDauer = 12 * 60 * 60L;
   lichtZyklenRemaining = sekundenZuZyklen(lichtDauer);
+
+  //Pumpen
+  WritePumpValues();
 }
 
 int sekundenZuZyklen(int Sekunden) {
@@ -173,7 +181,8 @@ int readButtons() {
     if (digitalRead(ButtonPins[i]) == HIGH) return i;
   }
   return -1;
-  
+}
+
 bool tempInRange(int Temp) {
   return Temp < MAX_TEMP && Temp > MIN_TEMP;
 }
