@@ -29,7 +29,7 @@
 #define PumdFert 2
 
 //Pin für Ventilator //Ebenfalls über Relais/Transistor mit eigener Versorgung //Benötigt PWM-fähigen Digital-Pin
-#define Vent 3
+#define VentPin 3
 
 //Pins für Buttons
 #define ButtonLinks 4
@@ -52,6 +52,7 @@
 #define DHT_TIMEOUT 0
 #define DHT_CHECKSUM 1
 #define MOISTURE_WARNING 2
+#define TEMP_HANDLING_ERROR 3
 /////////////////
 
 ///////////////// Parameter
@@ -59,13 +60,15 @@
 #define LEGIT_TEMP_DIFF 4 //Maximale Temp-Diff zwischen Ein- und Ausgang
 #define MIN_MOISTURE 700 //Maximaler Widerstandswert der Hygrometer -> minimaler Feuchte-Zustand des Bodens
 #define MAX_MOISTURE 280 //Minimnaler Widerstandswert, dann Warnung
-#define MAX_TEMP 30
+#define PUMP_TIME 10 //Zeit, in der die Pumpen arbeiten, wenn der boden trocken ist. //TODO: Testen und besseren Wert finden!!
+#define MAX_TEMP 30 //Höher werden wir ohne Heizelement niemals kommen... Keine Aloha-Temperaturen hier
 #define MIN_TEMP 20 //Wir können nicht kühlen, also ist für ein Indoor-Konstrukt alles niedrigere eh unrealistisch
-/////////////////
+#define VAR_TEMP 2 //2°C Abweichung klingen gut, hoffe ich? Fuck this, wir brauchen einen scheiß Botaniker...
+///////////////// Variablen für den Input
 
 int ButtonPins[3] = {ButtonLinks, ButtonMitte, ButtonRechts};
 
-/////////////////
+///////////////// User-Variablen
 
 dht DHT;
 unsigned int moistures[4]; //Bodenfeuchte in % //Vielleicht lieber als Widerstandswert speichern?
@@ -75,6 +78,11 @@ unsigned long fertFreq; //in Sekunden
 unsigned int fertZyklenRemaining;
 unsigned long lichtDauer; //in Sekunden
 unsigned int lichtZyklenRemaining;
+
+///////////////// Betriebsvariablen
+
+int fanpower = 128; //Zwischen 0 und 255, wird mit analogWrite über PWM geschrieben und kontrolliert Lüfterstärke
+int Hygros[4] = {Hyg0, Hyg1, Hyg2, Hyg3};
 
 /////////////////
 
@@ -150,6 +158,8 @@ bool Fehler(int Identifier, String meldung) {
       Anzeigen(Nachricht + meldung);
       break;
     case (MOISTURE_WARNING):
+      break;
+    case (TEMP_HANDLING_ERROR):
       break;
     case (DHT_CHECKSUM):
       break;
