@@ -29,7 +29,7 @@
 #define PumdFert 2
 
 //Pin für Ventilator //Ebenfalls über Relais/Transistor mit eigener Versorgung //Benötigt PWM-fähigen Digital-Pin
-#define Vent 3
+#define VentPin 3
 
 //Pins für Buttons
 #define ButtonLinks 4
@@ -52,6 +52,7 @@
 #define DHT_TIMEOUT 0
 #define DHT_CHECKSUM 1
 #define MOISTURE_WARNING 2
+#define TEMP_HANDLING_ERROR 3
 /////////////////
 
 ///////////////// Parameter
@@ -59,13 +60,15 @@
 #define LEGIT_TEMP_DIFF 4 //Maximale Temp-Diff zwischen Ein- und Ausgang
 #define MIN_MOISTURE 700 //Maximaler Widerstandswert der Hygrometer -> minimaler Feuchte-Zustand des Bodens
 #define MAX_MOISTURE 280 //Minimnaler Widerstandswert, dann Warnung
-#define MAX_TEMP 30
+#define PUMP_TIME 10 //Zeit, in der die Pumpen arbeiten, wenn der boden trocken ist. //TODO: Testen und besseren Wert finden!!
+#define MAX_TEMP 30 //Höher werden wir ohne Heizelement niemals kommen... Keine Aloha-Temperaturen hier
 #define MIN_TEMP 20 //Wir können nicht kühlen, also ist für ein Indoor-Konstrukt alles niedrigere eh unrealistisch
-/////////////////
+#define VAR_TEMP 2 //2°C Abweichung klingen gut, hoffe ich? Fuck this, wir brauchen einen scheiß Botaniker...
+///////////////// Variablen für den Input
 
 int ButtonPins[3] = {ButtonLinks, ButtonMitte, ButtonRechts};
 
-/////////////////
+///////////////// User-Variablen
 
 dht DHT;
 unsigned int moistures[4]; //Bodenfeuchte in % //Vielleicht lieber als Widerstandswert speichern?
@@ -75,6 +78,11 @@ unsigned long fertFreq; //in Sekunden
 unsigned int fertZyklenRemaining;
 unsigned long lichtDauer; //in Sekunden
 unsigned int lichtZyklenRemaining;
+
+///////////////// Betriebsvariablen
+
+int fanpower = 128; //Zwischen 0 und 255, wird mit analogWrite über PWM geschrieben und kontrolliert Lüfterstärke
+int Hygros[4] = {Hyg0, Hyg1, Hyg2, Hyg3};
 
 /////////////////
 
@@ -88,13 +96,11 @@ void setup() {
 void loop() {
   // put your main code here, to run repeatedly:
   delay(DELAY_NORMAL);
-  int in = getTemperatur(DHTin);
-  int out = getTemperatur(DHTout);
-  //TODO: Prüfung der Temperaturunterschiede und der Durchschnittstemperatur
-  //Dann Regelung des Lüfters über PWM
-  //Wenn gegeben auch Heizelement regeln
+  if (!handleTemperaturen(getTemperatur(DHTin), getTemperatur(DHTout))) {
+    Fehler(TEMP_HANDLING_ERROR, "Zu kalt, aber auch schlecht durchlüftet!");
+  }
   //Dann Prüfung der Bodenfeuchten und bei Bedarf betätigen der Pumpen
-  //Prüfung der Feuchte eventuell auch nicht bei jedem Zyklus
+  handleBodenFeuchten();
   //GROßES TODO: Planen, wie man die Bedienung realisieren könnte:
   //Nötig sind Eingaben für Temperatur, Belichtungszeit, 4 x Bodenfeuchtewerte und eventuell für Düngerzugabe
 }
@@ -151,6 +157,8 @@ bool Fehler(int Identifier, String meldung) {
       break;
     case (MOISTURE_WARNING):
       break;
+    case (TEMP_HANDLING_ERROR):
+      break;
     case (DHT_CHECKSUM):
       break;
     //TODO: Für weitere Fehlerfälle anpassen
@@ -170,6 +178,44 @@ int getMoisture(int pin) {
   return map(sensorResistance, MAX_MOISTURE, MIN_MOISTURE, 100, 0);
 }
 
+bool handleTemperaturen(int tIn, int tOut) {
+  //Temperaturdurchschnitt sollte bei Solltemperatur liegen. Darum heißt sie Solltemperatur.
+  int Abweichung = (tIn + tOut) / 2 - temperature;
+  //Durchschnittstemperatur auswerten
+  //Wenn gegeben später auch Heizelement regeln
+  if (Abweichung < -2) {
+    //Insgesamt zu kalt im Gewächshaus -> Weniger Lüftung, damit mehr Zeit zum Erwärmen
+    changeFanPower(-10);
+  }
+  if (Abweichung > 2) {
+    //Zu warm im Gewächshaus -> mehr (hoffentlich kältere) Luft durchpusten
+    changeFanPower(10);
+  }
+  //Temperaturdifferenz auswerten
+  //Temperaturgradient ist meiner Meinung nach gefährlicher als eine abweichende Gesamttemperatur, deshalb größere Änderungen, um sich im Konfliktfall durchzusetzen.
+  if (tOut - tIn > LEGIT_TEMP_DIFF) {
+    //Ziemlich hoher Temperaturgradient, spricht für schlechte Durchlüftung
+    changeFanPower(20);
+    if (Abweichung < -2 ) {
+      //Zu kalt, aber gleichzeitig schlecht durchlüftet -> Dilemma :O
+      return false;
+    }
+  }
+  return true;
+}
+
+void handleBodenFeuchten() {
+  for (int i = 0; i < 4; i++) {
+    int Feuchte = getMoisture(Hygros[i]);
+    if (Feuchte < moistures[i] - 10 || Feuchte <= 0) {
+      //Pumpen für den Abschnitt aktivieren
+      DoPumpThings(i, 1);
+      delay(PUMP_TIME * 1000); //Warten, während die Pumpen arbeiten //TODO: Hier eventuell alle aktuellen Timer weiter laufen lassen
+      DoPumpThings(i, 0);
+    }
+  }
+}
+
 void initiateButtons() {
   for (int i = 0; i < sizeof(ButtonPins) / sizeof(int); i++) {
     pinMode(ButtonPins[i], INPUT);
@@ -183,8 +229,14 @@ int readButtons() {
   return -1;
 }
 
-bool tempInRange(int Temp) {
+bool tempInputInRange(int Temp) { //Bei Eingabe prüfen, ob die Zielwerte realistisch sind
   return Temp < MAX_TEMP && Temp > MIN_TEMP;
+}
+
+void changeFanPower(int Differenz) {
+  fanpower += Differenz;
+  fanpower = constrain(fanpower, 0, 255);
+  analogWrite(VentPin, fanpower);
 }
 
 bool Anzeigen(String Text) {

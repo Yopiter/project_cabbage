@@ -19,7 +19,7 @@ Status
 Temperature
 ------------------------------------------------------------
 
-Ziel Temperatur (interne Standardabweichung 2 Grad
+Ziel Temperatur (interne Standardabweichung 2 Grad)
 _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
   T a r g e t   T e m p   ° C
 _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
