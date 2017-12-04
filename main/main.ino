@@ -179,7 +179,7 @@ int getMoisture(int pin) {
 }
 
 bool handleTemperaturen(int tIn, int tOut) {
-  //Temperaturdurchschnitt sollte bei Solltemperatur liegen. Darum heißt sie Solltemepratur.
+  //Temperaturdurchschnitt sollte bei Solltemperatur liegen. Darum heißt sie Solltemperatur.
   int Abweichung = (tIn + tOut) / 2 - temperature;
   //Durchschnittstemperatur auswerten
   //Wenn gegeben später auch Heizelement regeln
@@ -229,7 +229,7 @@ int readButtons() {
   return -1;
 }
 
-bool tempInputInRange(int Temp) { //Bei Eingabe prüfen, ob die Zielwere realistisch sind
+bool tempInputInRange(int Temp) { //Bei Eingabe prüfen, ob die Zielwerte realistisch sind
   return Temp < MAX_TEMP && Temp > MIN_TEMP;
 }
 
