@@ -37,7 +37,7 @@
 
 class dht
 {
-public:
+  public:
     // return values:
     // DHTLIB_OK
     // DHTLIB_ERROR_CHECKSUM
@@ -45,15 +45,23 @@ public:
     int read11(uint8_t pin);
     int read(uint8_t pin);
 
-    inline int read21(uint8_t pin) { return read(pin); };
-    inline int read22(uint8_t pin) { return read(pin); };
-    inline int read33(uint8_t pin) { return read(pin); };
-    inline int read44(uint8_t pin) { return read(pin); };
+    inline int read21(uint8_t pin) {
+      return read(pin);
+    };
+    inline int read22(uint8_t pin) {
+      return read(pin);
+    };
+    inline int read33(uint8_t pin) {
+      return read(pin);
+    };
+    inline int read44(uint8_t pin) {
+      return read(pin);
+    };
 
     double humidity;
     double temperature;
 
-private:
+  private:
     uint8_t bits[5];  // buffer to receive data
     int _readSensor(uint8_t pin, uint8_t wakeupDelay);
 };
