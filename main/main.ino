@@ -18,15 +18,17 @@
 #define ClockPin 11
 #define LatchPin 12
 
-//Pins auf Shift-Register //4 Pumpen zur Bewässerung
+////Pins auf Shift-Register
+//4 Pumpen zur Bewässerung, 1 Pumpe für Dünger
 //Pumpen werden entweder über Relay oder über Transistor angesteuert, haben eine eigene externe Stromversorgung mit 12 V
-#define Pump0 0 //Pumpe für Gebiet 0
-#define Pump1 1
-#define Pump2 2
-#define Pump3 3
-
-//Pin für eine eventuelle Düngerpumpe, die das Frischwasser mit Dünger spiken würde
-#define PumdFert 2
+#define Pump0 1 //Pumpe für Gebiet 0
+#define Pump1 2
+#define Pump2 3
+#define Pump3 4
+#define PumpFert 0
+//1 Pin für Heizelement
+#define Heizung 5
+////Shift Register End
 
 //Pin für Ventilator //Ebenfalls über Relais/Transistor mit eigener Versorgung //Benötigt PWM-fähigen Digital-Pin
 #define VentPin 3
@@ -84,11 +86,17 @@ unsigned int lichtZyklenRemaining;
 int fanpower = 128; //Zwischen 0 und 255, wird mit analogWrite über PWM geschrieben und kontrolliert Lüfterstärke
 int Hygros[4] = {Hyg0, Hyg1, Hyg2, Hyg3};
 
+///////////////// Prototypes
+
+void writeToRegister(int PinToChange, int State = -1);
+void DoPumpThings(int PumpenNummer, int Zustand = -1);
+void ToggleHeizung(int Zustand = -1);
+
 /////////////////
 
 
 void setup() {
-  initiateButtons();
+  initiatePins();
   Serial.begin(9600);
   Serial.println("Ich beschwöre den magischen Schnittlauch!!");
 }
@@ -113,9 +121,6 @@ bool initStandardValues() {
   fertZyklenRemaining = sekundenZuZyklen(fertFreq);
   lichtDauer = 12 * 60 * 60L;
   lichtZyklenRemaining = sekundenZuZyklen(lichtDauer);
-
-  //Pumpen
-  WritePumpValues();
 }
 
 int sekundenZuZyklen(int Sekunden) {
@@ -186,10 +191,12 @@ bool handleTemperaturen(int tIn, int tOut) {
   if (Abweichung < -2) {
     //Insgesamt zu kalt im Gewächshaus -> Weniger Lüftung, damit mehr Zeit zum Erwärmen
     changeFanPower(-10);
+    ToggleHeizung(HIGH);
   }
   if (Abweichung > 2) {
     //Zu warm im Gewächshaus -> mehr (hoffentlich kältere) Luft durchpusten
     changeFanPower(10);
+    ToggleHeizung(LOW);
   }
   //Temperaturdifferenz auswerten
   //Temperaturgradient ist meiner Meinung nach gefährlicher als eine abweichende Gesamttemperatur, deshalb größere Änderungen, um sich im Konfliktfall durchzusetzen.
@@ -198,6 +205,7 @@ bool handleTemperaturen(int tIn, int tOut) {
     changeFanPower(20);
     if (Abweichung < -2 ) {
       //Zu kalt, aber gleichzeitig schlecht durchlüftet -> Dilemma :O
+      //Heizung sollte bereits oben auf HIGH gestellt worden sein
       return false;
     }
   }
@@ -216,10 +224,14 @@ void handleBodenFeuchten() {
   }
 }
 
-void initiateButtons() {
+void initiatePins() {
   for (int i = 0; i < sizeof(ButtonPins) / sizeof(int); i++) {
     pinMode(ButtonPins[i], INPUT);
   }
+  pinMode(LatchPin, OUTPUT);
+  pinMode(ClockPin, OUTPUT);
+  pinMode(DataPin, OUTPUT);
+  writeToRegister(0, LOW); //Shift Register komplett auf LOW stellen
 }
 
 int readButtons() {

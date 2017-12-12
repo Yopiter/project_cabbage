@@ -1,29 +1,20 @@
-int pumpenZustand[8] = {0, 0, 0, 0, 0, 0, 0, 0};
+byte ShiftRegisterZustand = 0;
 
-void WritePumpValues() {
-  //Man weiß ja nie, wann mans mal vergessen hat auszumachen ^^
-  digitalWrite(DataPin, LOW);
-  digitalWrite(ClockPin, LOW);
-  //GOGO!
-  digitalWrite(LatchPin, LOW);
-  for (int i = 0; i < 8; i++) {
-    digitalWrite(ClockPin, LOW);
-    digitalWrite(DataPin, pumpenZustand[i]);
-    digitalWrite(ClockPin, HIGH);
-    digitalWrite(DataPin, LOW);
-  }
-  digitalWrite(ClockPin, LOW);
-  digitalWrite(LatchPin, HIGH);
+void DoPumpThings(int PumpenNummer, int Zustand) { //Bloß Umwandlung von Pumpennummer in Pinnummer des Schift Registers
+  writeToRegister(PumpenNummer + 1, Zustand);
 }
 
-void DoPumpThings(int PumpenNummer, int Zustand) { //wenn man einen Default-Wert für Zustand (-1) übergibt, kackt der Compiler ab XD
-  switch (Zustand) {
-    case (0):
-    case (1):
-      pumpenZustand[PumpenNummer] = Zustand;
-      break;
-    case (-1): //Toggle, auch wenn ich nicht glaube dass wirs jemals brauchen werden :D
-      pumpenZustand[PumpenNummer] = pumpenZustand[PumpenNummer] == 0 ? 1 : 0;
+void ToggleHeizung(int Zustand) {
+  writeToRegister(Heizung, Zustand);
+}
+
+void writeToRegister(int PinToChange, int State) {
+  if (State == -1) { //Toggle
+    State = bitRead(ShiftRegisterZustand, PinToChange) - 1;
+    State = abs(State); //Auf eigener Zeile, weil es so in der Doku "empfohlen" wurde...
   }
-  WritePumpValues();
+  bitWrite(ShiftRegisterZustand, PinToChange, State);
+  digitalWrite(LatchPin, LOW);
+  shiftOut(DataPin, ClockPin, MSBFIRST, ShiftRegisterZustand);
+  digitalWrite(LatchPin, HIGH);
 }
