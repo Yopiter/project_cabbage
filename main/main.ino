@@ -30,9 +30,6 @@
 #define Heizung 5
 ////Shift Register End
 
-//Pin für eine eventuelle Düngerpumpe, die das Frischwasser mit Dünger spiken würde
-
-
 //Pin für Ventilator //Ebenfalls über Relais/Transistor mit eigener Versorgung //Benötigt PWM-fähigen Digital-Pin
 #define VentPin 3
 
