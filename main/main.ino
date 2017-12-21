@@ -47,16 +47,16 @@
 #define DHT_TIMEOUT 0
 #define DHT_CHECKSUM 1
 #define MOISTURE_WARNING 2
-
 /////////////////
 
 ///////////////// Parameter
 #define DELAY_NORMAL 2000 //Wartezeit zwischen Zyklen
 #define DELAY_USER_MODE 200 //Abfragetakt der Buttons und der Ausgabe
 #define LEGIT_TEMP_DIFF 4 //Maximale Temp-Diff zwischen Ein- und Ausgang
-#define MIN_MOISTURE 800 //Maximaler Widerstandswert der Hygrometer -> minimaler Feuchte-Zustand des Bodens
-#define MAX_MOISTURE 300 //Minimnaler Widerstandswert, dann Warnung
-
+#define MIN_MOISTURE 700 //Maximaler Widerstandswert der Hygrometer -> minimaler Feuchte-Zustand des Bodens
+#define MAX_MOISTURE 280 //Minimnaler Widerstandswert, dann Warnung
+#define MAX_TEMP 30
+#define MIN_TEMP 20 //Wir können nicht kühlen, also ist für ein Indoor-Konstrukt alles niedrigere eh unrealistisch
 /////////////////
 
 int ButtonPins[3] = {ButtonLinks, ButtonMitte, ButtonRechts};
@@ -188,5 +188,8 @@ int readButtons() {
     if (digitalRead(ButtonPins[i]) == HIGH) return i;
   }
   return -1;
+  
+bool tempInRange(int Temp) {
+  return Temp < MAX_TEMP && Temp > MIN_TEMP;
 }
 
