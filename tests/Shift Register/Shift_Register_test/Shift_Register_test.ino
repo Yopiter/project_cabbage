@@ -32,5 +32,6 @@ void writeToRegister(int PinToChange, int State) {
   digitalWrite(LatchPin, LOW);
   shiftOut(DataPin, ClockPin, MSBFIRST, ShiftRegisterZustand);
   digitalWrite(LatchPin, HIGH);
+  Serial.println(PinToChange, State);
 }
 
