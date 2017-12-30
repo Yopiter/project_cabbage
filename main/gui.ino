@@ -75,8 +75,20 @@ void setBottomLine() {
     case (666):
       copy(SelectString, BottomLine, sizeof(SelectString));
       break;
-    case (2):
-      sprintf(BottomLine, InDecreaseString, temperature);
+    case (1):
+      sprintf(BottomLine, " <    %i °C  > ", temperature);
+      break;
+    case (2): {
+        printInDecreaseString(2, temperature, "C", 1);
+        break;
+      }
+    case (3):                                               //Wie wird das mit den 4 verschiedenen Moistures gelöst?
+      sprintf(BottomLine, " <    %i %   > ", moistures[0]); //TODO!!
+      break;
+    case (4):
+      printInDecreaseString(2, moistures[0], "%", 1);
+      break;
+    case (5):
       break;
   }
 }
@@ -90,7 +102,7 @@ void copy(char* src, char* dst, int len) {
 }
 
 //Erstellen des klassischen Strings zum Erhöhen/Senken von Werten. Aktualisiert BottomLine.
-void printInDecreaseString(int Stellen, int Wert, char* Einheit, int Einheitenlength) { //No prototype, weil gui.ino vor main.ino eingefügt wird
+void printInDecreaseString(int Stellen, int Wert, const char *Einheit, int Einheitenlength) { //No prototype, weil gui.ino vor main.ino eingefügt wird
   int firstPart = (int)(7 - round(Stellen / 2 + 0.5)); //Letzter Index mit Leerzeichen
   char Zeile[17] = " -";
   whitespacen(Zeile, 2, firstPart - 1); //Initialisieren und mit Whitespaces füllen

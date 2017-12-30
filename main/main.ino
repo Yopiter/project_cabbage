@@ -199,8 +199,7 @@ int getMoisture(int pin) {
   if (sensorResistance < MAX_MOISTURE || sensorResistance > MIN_MOISTURE) {
     Fehler(MOISTURE_WARNING, "Pin " + pin);
   }
-  sensorResistance = constrain(sensorResistance, MAX_MOISTURE, MIN_MOISTURE);
-  return map(sensorResistance, MAX_MOISTURE, MIN_MOISTURE, 100, 0);
+  return ResistanceToMoisture(sensorResistance);
 }
 
 bool handleTemperaturen(int tIn, int tOut) {
@@ -269,6 +268,11 @@ void changeFanPower(int Differenz) {
   fanpower += Differenz;
   fanpower = constrain(fanpower, 0, 255);
   analogWrite(VentPin, fanpower);
+}
+
+int ResistanceToMoisture(int sensorResistance) {
+  sensorResistance = constrain(sensorResistance, MAX_MOISTURE, MIN_MOISTURE);
+  return map(sensorResistance, MAX_MOISTURE, MIN_MOISTURE, 100, 0);
 }
 
 bool Anzeigen(String Text) {

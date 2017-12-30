@@ -9,7 +9,6 @@ int secPos = 0;
 bool third = false;
 long standardTimeouts[2] = {10000, 60000};
 long idleTime = 0;
-bool userMode = false;
 
 int custBots[][2] = {{7, 0}, {10, 1}, {14, 2}, {16, 3}, {17, 4}};
 
@@ -39,21 +38,17 @@ void getBottom(int id, char botBuffer[17]) {
       sprintf(output, " <   %3d h    > ", functioncall());
       break;
     case 5:
-      copy(standardBottom, output, 17);
+      copy(standardBottom, output, sizeof(output));
     default:
-      copy(thirdLayerBottom, output, 17);
+      copy(thirdLayerBottom, output, sizeof(output));
       break;
   }
-  copy(output, botBuffer, 17);
+  copy(output, botBuffer, sizeof(output));
 }
 
-void copy(char* src, char* dst, int len) {
-  memcpy(dst, src, sizeof(src[0])*len);
-}
-
-bool EngageUserMode() {
+bool EngageUserMode_old() {
   if ((third && idleTime > standardTimeouts[1]) | (!third && idleTime > standardTimeouts[0])) {
-    userMode=false; //Timeout: UserMode beenden und das auch der Loop-funktion sagen
+    userMode = false; //Timeout: UserMode beenden und das auch der Loop-funktion sagen
     return false;
   }
   //Display
@@ -103,9 +98,10 @@ bool EngageUserMode() {
   //Interaction logic
   int button = readButtons();
 
-  if (button == -1)
+  if (button == -1) {
     idleTime += DELAY_USER_MODE;
-  return false;
+    return false;
+  }
   else {
     idleTime = 0; //Button pressed -> Idle Timer reset
 
