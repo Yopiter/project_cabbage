@@ -55,6 +55,7 @@
 #define DHT_CHECKSUM 1
 #define MOISTURE_WARNING 2
 #define TEMP_HANDLING_ERROR 3
+#define SYS_ERROR 4
 /////////////////
 
 ///////////////// Parameter
@@ -86,6 +87,7 @@ unsigned int lichtZyklenRemaining;
 
 int fanpower = 128; //Zwischen 0 und 255, wird mit analogWrite über PWM geschrieben und kontrolliert Lüfterstärke
 int Hygros[4] = {Hyg0, Hyg1, Hyg2, Hyg3};
+bool userMode = false;
 
 ///////////////// Prototypes
 
@@ -103,19 +105,19 @@ void setup() {
 }
 
 void loop() {
-  if(!userMode){
-  delay(DELAY_NORMAL);
-  if (!handleTemperaturen(getTemperatur(DHTin), getTemperatur(DHTout))) {
-    Fehler(TEMP_HANDLING_ERROR, "Zu kalt, aber auch schlecht durchlüftet!");
-  }
-  //Dann Prüfung der Bodenfeuchten und bei Bedarf betätigen der Pumpen
-  handleBodenFeuchten();
-  //GROßES TODO: Planen, wie man die Bedienung realisieren könnte:
-  //Nötig sind Eingaben für Temperatur, Belichtungszeit, 4 x Bodenfeuchtewerte und eventuell für Düngerzugabe
+  if (!userMode) {
+    delay(DELAY_NORMAL);
+    if (!handleTemperaturen(getTemperatur(DHTin), getTemperatur(DHTout))) {
+      Fehler(TEMP_HANDLING_ERROR, "Zu kalt, aber auch schlecht durchlüftet!");
+    }
+    //Dann Prüfung der Bodenfeuchten und bei Bedarf betätigen der Pumpen
+    handleBodenFeuchten();
+    //GROßES TODO: Planen, wie man die Bedienung realisieren könnte:
+    //Nötig sind Eingaben für Temperatur, Belichtungszeit, 4 x Bodenfeuchtewerte und eventuell für Düngerzugabe
   }
   else {
     delay(DELAY_USER_MODE);
-    if (engageUserMode()) {
+    if (EngageUserMode()) {
       //Alles fit im Schritt, geht okidoki weiter
       //Vielleicht etwas Musik spielen
     }
@@ -180,6 +182,8 @@ bool Fehler(int Identifier, String meldung) {
     case (TEMP_HANDLING_ERROR):
       break;
     case (DHT_CHECKSUM):
+      break;
+    case (SYS_ERROR):
       break;
     //TODO: Für weitere Fehlerfälle anpassen
     default:
