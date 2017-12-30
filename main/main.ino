@@ -94,6 +94,7 @@ bool userMode = false;
 void writeToRegister(int PinToChange, int State = -1);
 void DoPumpThings(int PumpenNummer, int Zustand = -1);
 void ToggleHeizung(int Zustand = -1);
+void whitespacen(char* Str, int Start = 0, int len = 1, bool terminieren = true);
 
 /////////////////
 
