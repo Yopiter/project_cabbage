@@ -68,6 +68,12 @@
 #define MAX_TEMP 30 //Höher werden wir ohne Heizelement niemals kommen... Keine Aloha-Temperaturen hier
 #define MIN_TEMP 20 //Wir können nicht kühlen, also ist für ein Indoor-Konstrukt alles niedrigere eh unrealistisch
 #define VAR_TEMP 2 //2°C Abweichung klingen gut, hoffe ich? Fuck this, wir brauchen einen scheiß Botaniker...
+/////////////////
+
+///////////////// Timeouts
+#define TIMEOUT_USER_MODE 20000 //20 Sekunden Pause, bis sich der User-Mode beendet
+/////////////////
+
 ///////////////// Variablen für den Input
 
 int ButtonPins[3] = {ButtonLinks, ButtonMitte, ButtonRechts};

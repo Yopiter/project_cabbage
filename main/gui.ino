@@ -17,8 +17,20 @@ int aktTiefe = 0;
 int aktMenue = 0;
 int aktUnterMenue = 0;
 
-bool EngageUserMode() {
+bool isUserMode = false;
+unsigned long startTimeUserMode;
 
+void startUserMode() {
+  startTimeUserMode = millis();
+  isUserMode = true;
+}
+
+bool EngageUserMode() {
+  //Prüfung ob abgelaufen
+  if(isCountdownDown(startTimeUserMode,TIMEOUT_USER_MODE){
+    isUserMode=false;
+    return false;
+  }
 }
 
 void setTopLine() {
@@ -102,7 +114,7 @@ void copy(char* src, char* dst, int len) {
 }
 
 //Erstellen des klassischen Strings zum Erhöhen/Senken von Werten. Aktualisiert BottomLine.
-void printInDecreaseString(int Stellen, int Wert, const char *Einheit, int Einheitenlength) { //No prototype, weil gui.ino vor main.ino eingefügt wird
+void printInDecreaseString(int Stellen, int Wert, const char *Einheit, int Einheitenlength) {
   int firstPart = (int)(7 - round(Stellen / 2 + 0.5)); //Letzter Index mit Leerzeichen
   char Zeile[17] = " -";
   whitespacen(Zeile, 2, firstPart - 1); //Initialisieren und mit Whitespaces füllen
@@ -154,6 +166,26 @@ void whitespacen(char* Str, int Start, int len, bool terminieren) {
   }
 }
 
+void doLeftButton() {
+
+}
+
+void doRightButton() {
+
+}
+
+void doMidButton() {
+
+}
+
+bool isCountdownDown(unsigned long startZeit, unsigned long countdown) {
+  return millis() - startZeit >= countdown;
+}
+
+bool isCountdownDown(unsigned long startZeit, int countdown) {
+  return isCountdownDown(startZeit, (unsigned long) countdown);
+}
+
 //Wahrscheinlich nicht mehr nötig
 bool IntInArray(int Value, int* Array, int Arrlength) {
   for (int i = 0; i < Arrlength; i++) {
@@ -163,5 +195,3 @@ bool IntInArray(int Value, int* Array, int Arrlength) {
   }
   return false;
 }
-
-
