@@ -18,17 +18,17 @@ int aktMenue = 0;
 int aktUnterMenue = 0;
 
 bool isUserMode = false;
-unsigned long startTimeUserMode;
 
 void startUserMode() {
-  startTimeUserMode = millis();
+  UserModeTimer.start();
   isUserMode = true;
 }
 
 bool EngageUserMode() {
   //Prüfung ob abgelaufen
-  if(isCountdownDown(startTimeUserMode,TIMEOUT_USER_MODE){
-    isUserMode=false;
+  if (UserModeTimer.done()) {
+    UserModeTimer.reset();
+    isUserMode = false;
     return false;
   }
 }
@@ -94,13 +94,25 @@ void setBottomLine() {
         printInDecreaseString(2, temperature, "C", 1);
         break;
       }
-    case (3):                                               //Wie wird das mit den 4 verschiedenen Moistures gelöst?
+    case (3):   //Wie wird das mit den 4 verschiedenen Moistures gelöst?
+    case (5):
       sprintf(BottomLine, " <    %i %   > ", moistures[0]); //TODO!!
       break;
     case (4):
+    case (6):
       printInDecreaseString(2, moistures[0], "%", 1);
       break;
-    case (5):
+    case (7):
+      sprintf(BottomLine, " <    %i h   > ", millisToHours(lichtDauer));
+      break;
+    case (8):
+      printInDecreaseString(2, millisToHours(lichtDauer), "h", 1);
+      break;
+    case (9):
+      sprintf(BottomLine, " <    %i h   > ", millisToHours(fertFreq));
+      break;
+    case (10):
+      printInDecreaseString(2, millisToHours(fertFreq), "h", 1);
       break;
   }
 }
@@ -176,14 +188,6 @@ void doRightButton() {
 
 void doMidButton() {
 
-}
-
-bool isCountdownDown(unsigned long startZeit, unsigned long countdown) {
-  return millis() - startZeit >= countdown;
-}
-
-bool isCountdownDown(unsigned long startZeit, int countdown) {
-  return isCountdownDown(startZeit, (unsigned long) countdown);
 }
 
 //Wahrscheinlich nicht mehr nötig

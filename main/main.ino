@@ -1,3 +1,5 @@
+#include <neotimer.h>
+
 #include "dht.h"
 
 /////////////////Festlegen der Pinbelegung für die Signal-Leitungen
@@ -71,7 +73,11 @@
 /////////////////
 
 ///////////////// Timeouts
+
 #define TIMEOUT_USER_MODE 20000 //20 Sekunden Pause, bis sich der User-Mode beendet
+#define DEF_LIGHTING 12 //12 h Beleuchtung täglich
+#define DEF_FERT 84  //1 mal pro Woche
+
 /////////////////
 
 ///////////////// Variablen für den Input
@@ -84,9 +90,9 @@ dht DHT;
 unsigned int moistures[4]; //Bodenfeuchte in % //Vielleicht lieber als Widerstandswert speichern?
 unsigned int temperature;
 unsigned int fertPumpTime;
-unsigned long fertFreq; //in Sekunden
+unsigned long fertFreq; //in Millisekunden
 unsigned int fertZyklenRemaining;
-unsigned long lichtDauer; //in Sekunden
+unsigned long lichtDauer; //in Millisekunden
 unsigned int lichtZyklenRemaining;
 
 ///////////////// Betriebsvariablen
@@ -94,6 +100,12 @@ unsigned int lichtZyklenRemaining;
 int fanpower = 128; //Zwischen 0 und 255, wird mit analogWrite über PWM geschrieben und kontrolliert Lüfterstärke
 int Hygros[4] = {Hyg0, Hyg1, Hyg2, Hyg3};
 bool userMode = false;
+
+///////////////// Timer
+
+Neotimer LichtTimer = Neotimer(lichtDauer);
+Neotimer DunkelTimer = Neotimer(86400000 - lichtDauer);
+Neotimer UserModeTimer = Neotimer(TIMEOUT_USER_MODE);
 
 ///////////////// Prototypes
 
@@ -133,7 +145,6 @@ void loop() {
       //Display ausschalten
     }
     //Eventuelle Counter weiterlaufen lassen, aber nur weniger Zeit abziehen
-    //Bei den Countern in Zyklen nur jedes zehnte Mal einen abziehen oder es einfach lassen, macht nix
   }
 }
 
@@ -279,6 +290,10 @@ void changeFanPower(int Differenz) {
 int ResistanceToMoisture(int sensorResistance) {
   sensorResistance = constrain(sensorResistance, MAX_MOISTURE, MIN_MOISTURE);
   return map(sensorResistance, MAX_MOISTURE, MIN_MOISTURE, 100, 0);
+}
+
+int millisToHours(long mSec) {
+  return (int)(mSec / 3600000);
 }
 
 bool Anzeigen(String Text) {
