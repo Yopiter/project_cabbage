@@ -91,9 +91,7 @@ unsigned int moistures[4]; //Bodenfeuchte in % //Vielleicht lieber als Widerstan
 unsigned int temperature;
 unsigned int fertPumpTime;
 unsigned long fertFreq; //in Millisekunden
-unsigned int fertZyklenRemaining;
 unsigned long lichtDauer; //in Millisekunden
-unsigned int lichtZyklenRemaining;
 
 ///////////////// Betriebsvariablen
 
@@ -105,6 +103,7 @@ bool userMode = false;
 
 Neotimer LichtTimer = Neotimer(lichtDauer);
 Neotimer DunkelTimer = Neotimer(86400000 - lichtDauer);
+Neotimer FertTimer = Neotimer(fertFreq);
 Neotimer UserModeTimer = Neotimer(TIMEOUT_USER_MODE);
 
 ///////////////// Prototypes
@@ -153,9 +152,7 @@ bool initStandardValues() {
   temperature = 22;
   fertPumpTime = 10;
   fertFreq = 7 * 24 * 60 * 60L;
-  fertZyklenRemaining = sekundenZuZyklen(fertFreq);
   lichtDauer = 12 * 60 * 60L;
-  lichtZyklenRemaining = sekundenZuZyklen(lichtDauer);
 }
 
 int sekundenZuZyklen(int Sekunden) {
@@ -254,7 +251,7 @@ void handleBodenFeuchten() {
     if (Feuchte < moistures[i] - 10 || Feuchte <= 0) {
       //Pumpen für den Abschnitt aktivieren
       DoPumpThings(i, 1);
-      delay(PUMP_TIME * 1000); //Warten, während die Pumpen arbeiten //TODO: Hier eventuell alle aktuellen Timer weiter laufen lassen
+      delay(PUMP_TIME * 1000); //Warten, während die Pumpen arbeiten
       DoPumpThings(i, 0);
     }
   }

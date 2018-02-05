@@ -24,13 +24,33 @@ void startUserMode() {
   isUserMode = true;
 }
 
+void endUserMode() {
+  UserModeTimer.reset();
+  isUserMode = false;
+}
+
 bool EngageUserMode() {
   //Prüfung ob abgelaufen
   if (UserModeTimer.done()) {
-    UserModeTimer.reset();
-    isUserMode = false;
+    endUserMode();
     return false;
   }
+  //Ablauf, wenn im UserMode
+  int buttons = readButtons();
+  switch (buttons) {
+    case (0):
+      doLeftButton();
+      break;
+    case (1):
+      doMidButton();
+      break;
+    case (2):
+      doRightButton();
+      break;
+  }
+  //Anzeige des aktuellen Zustands
+  setTopLine();
+  setBottomLine();
 }
 
 void setTopLine() {
@@ -90,10 +110,9 @@ void setBottomLine() {
     case (1):
       sprintf(BottomLine, " <    %i °C  > ", temperature);
       break;
-    case (2): {
-        printInDecreaseString(2, temperature, "C", 1);
-        break;
-      }
+    case (2):
+      printInDecreaseString(2, temperature, "C", 1);
+      break;
     case (3):   //Wie wird das mit den 4 verschiedenen Moistures gelöst?
     case (5):
       sprintf(BottomLine, " <    %i %   > ", moistures[0]); //TODO!!
@@ -114,11 +133,59 @@ void setBottomLine() {
     case (10):
       printInDecreaseString(2, millisToHours(fertFreq), "h", 1);
       break;
+    case (11):
+      sprintf(BottomLine, " <    %i s   > ", fertPumpTime);
+      break;
+    case (12):
+      printInDecreaseString(2, fertPumpTime, "s", 1);
+      break;
+    case (13):
+      sprintf(BottomLine, " <    %i C   > ", getAvgTemp());
+      break;
+    case (14):
+      sprintf(BottomLine, " <    %i %   > ", getAvgMoisture());
+      break;
+    case (15):
+      sprintf(BottomLine, " <    %i h   > ", millisToHours(getTimeTillLightChange()));
+      break;
+    case (16):
+      sprintf(BottomLine, " <    %i h   > ", millisToHours(getTimeSinceLastFert()));
+      break;
   }
 }
 
 int getFormID() {
   return aktTiefe != 0 ? Pfade[aktMenue][aktUnterMenue][aktTiefe] : 0;
+}
+
+int getAvgTemp() {
+  return (int)round((getTemperatur(DHTin) + getTemperatur(DHTout)) / 2);
+}
+
+long getTimeTillLightChange() {
+  if (LichtTimer.started()) {
+    return LichtTimer.remaining();
+  }
+  else {
+    return DunkelTimer.remaining();
+  }
+}
+
+long getTimeSinceLastFert() {
+  if (FertTimer.started()) {
+    return FertTimer.elapsed();
+  }
+  else {
+    return 0;
+  }
+}
+
+int getAvgMoisture() {
+  int Feuchte = 0;
+  for (int i = 0; i < 4; i++) {
+    Feuchte += getMoisture(Hygros[i]);
+  }
+  return Feuchte / 4;
 }
 
 void copy(char* src, char* dst, int len) {
