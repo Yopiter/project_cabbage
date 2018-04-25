@@ -1,9 +1,12 @@
+
 int Pfade[][5][3] = {{{1, 2}, {666}}, //Temeparature
   {{3, 4}, {5, 6}, {666}},            //Soil
   {{7, 8}, {666}},                    //Lighting
   {{9, 10}, {11, 12}, {666}},         //Fertilizer
-  {{13}, {14}, {15}}                  //Status
+  {{13}, {14}, {15}, {666}}           //Status
 };
+int AnzahlUnterMenues[] = {1, 2, 1, 2, 3}; //Maximaler Index der Untermenüs pro Menüpunkt, Anpassen wenn Änderungen in der GUI!
+int AnzahlMenues = 4; //Maximaler Index der Menüs
 char MenuePunkte[][17] = {"Temperature", "Soil", "Lighting", "Fertilizer", "Status"};
 
 char SelectString[17] = " <   Select   > ";
@@ -18,6 +21,10 @@ int aktMenue = 0;
 int aktUnterMenue = 0;
 
 bool isUserMode = false;
+
+int getFormID() {
+  return aktTiefe > 0 ? Pfade[aktMenue][aktUnterMenue][aktTiefe - 1] : 0;
+}
 
 void startUserMode() {
   UserModeTimer.start();
@@ -68,7 +75,8 @@ void setTopLine() {
       break;
     case (5):
     case (6):
-      strcpy(TopLine, "Max. Moisture");
+      //Nicht wirklich implementiert!
+      strcpy(TopLine, "(Max. Moisture)");
       break;
     case (7):
     case (8):
@@ -152,10 +160,6 @@ void setBottomLine() {
       sprintf(BottomLine, " <    %i h   > ", millisToHours(getTimeSinceLastFert()));
       break;
   }
-}
-
-int getFormID() {
-  return aktTiefe != 0 ? Pfade[aktMenue][aktUnterMenue][aktTiefe] : 0;
 }
 
 int getAvgTemp() {
@@ -246,7 +250,45 @@ void whitespacen(char* Str, int Start, int len, bool terminieren) {
 }
 
 void doLeftButton() {
-
+  switch (aktTiefe) {
+    case (0): //Hauptmenü
+      aktMenue--;
+      if (aktMenue < 0) {
+        aktMenue = AnzahlMenues;
+      }
+      break;
+    case (1): //Eines der Menüs
+      aktUnterMenue--;
+      if (aktUnterMenue < 0) {
+        aktUnterMenue = AnzahlUnterMenues[aktMenue];
+      }
+      break;
+    case (2): //Direkt in der Bearbeitung der Werte
+      switch (getFormID()) {
+        case (2):
+          changeTargetTemp(false);
+          break;
+        case (4):
+          changeMinMoisture(-1);
+          break;
+        case (6):
+          changeMaxMoisture(-1);
+          break;
+        case (8):
+          changeLightingTime(-1);
+          break;
+        case (10):
+          changeFertFreq(-1);
+          break;
+        default:
+          Fehler(SYS_ERROR, "Unbekannte Werte");
+          break;
+      }
+      break;
+    default:
+      Fehler(SYS_ERROR, "Unbekannte Tiefe");
+      break;
+  }
 }
 
 void doRightButton() {

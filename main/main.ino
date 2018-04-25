@@ -63,22 +63,29 @@
 ///////////////// Parameter
 #define DELAY_NORMAL 2000 //Wartezeit zwischen Zyklen
 #define DELAY_USER_MODE 200 //Abfragetakt der Buttons und der Ausgabe
-#define LEGIT_TEMP_DIFF 4 //Maximale Temp-Diff zwischen Ein- und Ausgang
 #define MIN_MOISTURE 700 //Maximaler Widerstandswert der Hygrometer -> minimaler Feuchte-Zustand des Bodens
 #define MAX_MOISTURE 280 //Minimnaler Widerstandswert, dann Warnung
 #define PUMP_TIME 10 //Zeit, in der die Pumpen arbeiten, wenn der boden trocken ist. //TODO: Testen und besseren Wert finden!!
 #define MAX_TEMP 30 //Höher werden wir ohne Heizelement niemals kommen... Keine Aloha-Temperaturen hier
 #define MIN_TEMP 20 //Wir können nicht kühlen, also ist für ein Indoor-Konstrukt alles niedrigere eh unrealistisch
-#define VAR_TEMP 2 //2°C Abweichung klingen gut, hoffe ich? Fuck this, wir brauchen einen scheiß Botaniker...
+#define LEGIT_TEMP_DIFF 4 //Maximale Temp-Diff zwischen Sollwert und Avg. Temp. im Gehäuse
+#define VAR_TEMP 2 //Temperaturgradient innerhalb des Gewächshauses
 /////////////////
 
-///////////////// Timeouts
+///////////////// Default Timeouts
 
 #define TIMEOUT_USER_MODE 20000 //20 Sekunden Pause, bis sich der User-Mode beendet
 #define DEF_LIGHTING 12 //12 h Beleuchtung täglich
-#define DEF_FERT 84  //1 mal pro Woche
+#define DEF_FERT 168  //in h //1 mal pro Woche
 
 /////////////////
+
+///////////////// Konstanten
+
+unsigned long TagesDauer = 24L * 60 * 60 * 1000;
+
+/////////////////
+
 
 ///////////////// Variablen für den Input
 
@@ -101,10 +108,10 @@ bool userMode = false;
 
 ///////////////// Timer
 
-Neotimer LichtTimer = Neotimer(lichtDauer);
-Neotimer DunkelTimer = Neotimer(86400000 - lichtDauer);
-Neotimer FertTimer = Neotimer(fertFreq);
-Neotimer UserModeTimer = Neotimer(TIMEOUT_USER_MODE);
+Neotimer LichtTimer;
+Neotimer DunkelTimer;
+Neotimer FertTimer;
+Neotimer UserModeTimer;
 
 ///////////////// Prototypes
 
@@ -120,6 +127,7 @@ void setup() {
   initiatePins();
   Serial.begin(9600);
   Serial.println("Ich beschwöre den magischen Schnittlauch!!");
+  initStandardValues();
 }
 
 void loop() {
@@ -143,7 +151,6 @@ void loop() {
       //Usermode wurde beendet
       //Display ausschalten
     }
-    //Eventuelle Counter weiterlaufen lassen, aber nur weniger Zeit abziehen
   }
 }
 
@@ -151,8 +158,15 @@ bool initStandardValues() {
   moistures[0] = moistures[1] = moistures[2] = moistures[3] = 10; //I am ashamed of this...
   temperature = 22;
   fertPumpTime = 10;
-  fertFreq = 7 * 24 * 60 * 60L;
-  lichtDauer = 12 * 60 * 60L;
+  fertFreq = DEF_FERT * 60 * 60L;
+  lichtDauer = DEF_LIGHTING * 60 * 60L;
+
+
+
+  LichtTimer = Neotimer(lichtDauer);
+  DunkelTimer = Neotimer(TagesDauer - lichtDauer);
+  FertTimer = Neotimer(fertFreq);
+  UserModeTimer = Neotimer(TIMEOUT_USER_MODE);
 }
 
 int sekundenZuZyklen(int Sekunden) {
@@ -220,13 +234,12 @@ bool handleTemperaturen(int tIn, int tOut) {
   //Temperaturdurchschnitt sollte bei Solltemperatur liegen. Darum heißt sie Solltemperatur.
   int Abweichung = (tIn + tOut) / 2 - temperature;
   //Durchschnittstemperatur auswerten
-  //Wenn gegeben später auch Heizelement regeln
-  if (Abweichung < -2) {
+  if (Abweichung < -VAR_TEMP) {
     //Insgesamt zu kalt im Gewächshaus -> Weniger Lüftung, damit mehr Zeit zum Erwärmen
     changeFanPower(-10);
     ToggleHeizung(HIGH);
   }
-  if (Abweichung > 2) {
+  if (Abweichung > VAR_TEMP) {
     //Zu warm im Gewächshaus -> mehr (hoffentlich kältere) Luft durchpusten
     changeFanPower(10);
     ToggleHeizung(LOW);
@@ -236,7 +249,7 @@ bool handleTemperaturen(int tIn, int tOut) {
   if (tOut - tIn > LEGIT_TEMP_DIFF) {
     //Ziemlich hoher Temperaturgradient, spricht für schlechte Durchlüftung
     changeFanPower(20);
-    if (Abweichung < -2 ) {
+    if (Abweichung < -VAR_TEMP ) {
       //Zu kalt, aber gleichzeitig schlecht durchlüftet -> Dilemma :O
       //Heizung sollte bereits oben auf HIGH gestellt worden sein
       return false;
@@ -248,7 +261,7 @@ bool handleTemperaturen(int tIn, int tOut) {
 void handleBodenFeuchten() {
   for (int i = 0; i < 4; i++) {
     int Feuchte = getMoisture(Hygros[i]);
-    if (Feuchte < moistures[i] - 10 || Feuchte <= 0) {
+    if (Feuchte < moistures[i] || Feuchte <= 0) {
       //Pumpen für den Abschnitt aktivieren
       DoPumpThings(i, 1);
       delay(PUMP_TIME * 1000); //Warten, während die Pumpen arbeiten
