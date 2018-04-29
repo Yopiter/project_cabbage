@@ -155,7 +155,7 @@ void loop() {
   }
 }
 
-bool initStandardValues() {
+void initStandardValues() {
   moistures[0] = moistures[1] = moistures[2] = moistures[3] = 10; //I am ashamed of this...
   temperature = 22;
   fertPumpTime = 5;

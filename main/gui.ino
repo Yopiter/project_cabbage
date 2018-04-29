@@ -20,20 +20,18 @@ int aktTiefe = 0;
 int aktMenue = 0;
 int aktUnterMenue = 0;
 
-bool isUserMode = false;
-
 int getFormID() {
   return aktTiefe > 0 ? Pfade[aktMenue][aktUnterMenue][aktTiefe - 1] : 0;
 }
 
 void startUserMode() {
   UserModeTimer.start();
-  isUserMode = true;
+  userMode = true;
 }
 
 void endUserMode() {
   UserModeTimer.reset();
-  isUserMode = false;
+  userMode = false;
 }
 
 bool EngageUserMode() {
@@ -166,7 +164,7 @@ int getAvgTemp() {
   return (int)round((getTemperatur(DHTin) + getTemperatur(DHTout)) / 2);
 }
 
-long getTimeTillLightChange() {
+unsigned long getTimeTillLightChange() {
   if (LichtTimer.started()) {
     return LichtTimer.remaining();
   }
@@ -175,7 +173,7 @@ long getTimeTillLightChange() {
   }
 }
 
-long getTimeSinceLastFert() {
+unsigned long getTimeSinceLastFert() {
   if (FertTimer.started()) {
     return FertTimer.elapsed();
   }
