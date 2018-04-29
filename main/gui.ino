@@ -266,7 +266,7 @@ void doLeftButton() {
     case (2): //Direkt in der Bearbeitung der Werte
       switch (getFormID()) {
         case (2):
-          changeTargetTemp(false);
+          changeTargetTemp(-1);
           break;
         case (4):
           changeMinMoisture(-1);
@@ -280,6 +280,9 @@ void doLeftButton() {
         case (10):
           changeFertFreq(-1);
           break;
+        case (11):
+          changeFertVol(-1);
+          break;
         default:
           Fehler(SYS_ERROR, "Unbekannte Werte");
           break;
@@ -292,11 +295,75 @@ void doLeftButton() {
 }
 
 void doRightButton() {
-
+  switch (aktTiefe) {
+    case (0): //Hauptmenü
+      aktMenue++;
+      if (aktMenue > AnzahlMenues) {
+        aktMenue = 0;
+      }
+      break;
+    case (1): //Eines der Menüs
+      aktUnterMenue++;
+      if (aktUnterMenue > AnzahlUnterMenues[aktMenue]) {
+        aktUnterMenue = 0;
+      }
+      break;
+    case (2): //Direkt in der Bearbeitung der Werte
+      switch (getFormID()) {
+        case (2):
+          changeTargetTemp(1);
+          break;
+        case (4):
+          changeMinMoisture(1);
+          break;
+        case (6):
+          changeMaxMoisture(1);
+          break;
+        case (8):
+          changeLightingTime(1);
+          break;
+        case (10):
+          changeFertFreq(1);
+          break;
+        case (11):
+          changeFertVol(1);
+          break;
+        default:
+          Fehler(SYS_ERROR, "Unbekannte Werte");
+          break;
+      }
+      break;
+    default:
+      Fehler(SYS_ERROR, "Unbekannte Tiefe");
+      break;
+  }
 }
 
 void doMidButton() {
-
+  int FormID = getFormID();
+  switch (aktTiefe) {
+    case (0):
+      //Hauptmenü -> runter in Untermenü
+      aktTiefe++;
+      aktUnterMenue = 0;
+      break;
+    case (1):
+      if (FormID == 666) {
+        //Zurück ins Hauptmenü
+        aktTiefe--;
+        return;
+      }
+      //Untermenü -> runter in unterste Ebene
+      aktTiefe++;
+      break;
+    case (2):
+      //Bearbeitungsebene, zurück auf Untermenü-Ebene
+      aktTiefe--;
+      break;
+    default:
+      Fehler(SYS_ERROR, "Unbekannte Tiefe");
+      break;
+  }
 }
 
 //Wahrscheinlich nicht mehr nötig

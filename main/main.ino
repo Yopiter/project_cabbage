@@ -70,6 +70,7 @@
 #define MIN_TEMP 20 //Wir können nicht kühlen, also ist für ein Indoor-Konstrukt alles niedrigere eh unrealistisch
 #define LEGIT_TEMP_DIFF 4 //Maximale Temp-Diff zwischen Sollwert und Avg. Temp. im Gehäuse
 #define VAR_TEMP 2 //Temperaturgradient innerhalb des Gewächshauses
+#define MAX_FERT_PUMP 10 //Maximale Pumpdauer in s für Düngerzugabe, minimal ist 0 für kein Dünger
 /////////////////
 
 ///////////////// Default Timeouts
@@ -157,10 +158,9 @@ void loop() {
 bool initStandardValues() {
   moistures[0] = moistures[1] = moistures[2] = moistures[3] = 10; //I am ashamed of this...
   temperature = 22;
-  fertPumpTime = 10;
+  fertPumpTime = 5;
   fertFreq = DEF_FERT * 60 * 60L;
   lichtDauer = DEF_LIGHTING * 60 * 60L;
-
 
 
   LichtTimer = Neotimer(lichtDauer);
@@ -180,7 +180,7 @@ int getTemperatur(int pin) {
       //Eventuell grüne Lampe für Erfolg, aber eher nicht, um Strom zu sparen
       break;
     case DHTLIB_ERROR_CHECKSUM:
-      Fehler(DHT_TIMEOUT, "Pin " + pin); //Not implemented yet
+      Fehler(DHT_CHECKSUM, "Pin " + pin); //Not implemented yet
       break;
     case DHTLIB_ERROR_TIMEOUT:
       Fehler(DHT_TIMEOUT, "Pin " + pin);
@@ -200,19 +200,27 @@ int getTemperatur(int pin) {
 }
 
 bool Fehler(int Identifier, String meldung) {
+  char Nachricht[32];
   switch (Identifier) {
     case (DHT_TIMEOUT):
-      char Nachricht[25];
       sprintf(Nachricht, "DHT-Sensor Timed out at %d: ", millis());
       Anzeigen(Nachricht + meldung);
       break;
     case (MOISTURE_WARNING):
+      sprintf(Nachricht, "Moisture out of Bounds: ");
+      Anzeigen(Nachricht + meldung);
       break;
     case (TEMP_HANDLING_ERROR):
       break;
+      sprintf(Nachricht, "Error when handling temp.: ");
+      Anzeigen(Nachricht + meldung);
+      break;
     case (DHT_CHECKSUM):
+      //Völlig rille glaube ich... Wenns häufiger vorkommen vielleicht mal was sagen
       break;
     case (SYS_ERROR):
+      sprintf(Nachricht, "System Error: ");
+      Anzeigen(Nachricht + meldung);
       break;
     //TODO: Für weitere Fehlerfälle anpassen
     default:
@@ -220,6 +228,8 @@ bool Fehler(int Identifier, String meldung) {
       Serial.println(meldung);
       break;
   }
+  //Pause,damit man es lesen kann
+  delay(2000);
 }
 
 int getMoisture(int pin) {
