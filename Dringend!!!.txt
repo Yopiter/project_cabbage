@@ -1,0 +1,3 @@
+Raspi mit PiCam für Überwachung und Logs der Konstruktion!
+Einfache Website mit Intervallen für Speicherung der Bilder und Anzeige des aktuellen Bilds.
+Refresh: 5 sec
