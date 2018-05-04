@@ -204,23 +204,23 @@ bool Fehler(int Identifier, String meldung) {
   switch (Identifier) {
     case (DHT_TIMEOUT):
       sprintf(Nachricht, "DHT-Sensor Timed out at %d: ", millis());
-      Anzeigen(Nachricht + meldung);
+      Anzeigen(Nachricht);
       break;
     case (MOISTURE_WARNING):
       sprintf(Nachricht, "Moisture out of Bounds: ");
-      Anzeigen(Nachricht + meldung);
+      Anzeigen(Nachricht);
       break;
     case (TEMP_HANDLING_ERROR):
       break;
       sprintf(Nachricht, "Error when handling temp.: ");
-      Anzeigen(Nachricht + meldung);
+      Anzeigen(Nachricht);
       break;
     case (DHT_CHECKSUM):
       //Völlig rille glaube ich... Wenns häufiger vorkommen vielleicht mal was sagen
       break;
     case (SYS_ERROR):
       sprintf(Nachricht, "System Error: ");
-      Anzeigen(Nachricht + meldung);
+      Anzeigen(Nachricht);
       break;
     //TODO: Für weitere Fehlerfälle anpassen
     default:
@@ -316,7 +316,7 @@ int millisToHours(long mSec) {
   return (int)(mSec / 3600000);
 }
 
-bool Anzeigen(String Text) {
+bool Anzeigen(char Msg[]) {
   //TODO: Entscheidung, ob über Serial oder über LCD
 }
 
