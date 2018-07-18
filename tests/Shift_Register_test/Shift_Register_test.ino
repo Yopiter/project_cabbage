@@ -1,9 +1,9 @@
 //Pins für Shift Register
-#define DataPin 10
-#define ClockPin 11
-#define LatchPin 13
+#define ClockPin 10
+#define LatchPin 11
+#define DataPin 12
 
-byte ShiftRegisterZustand = 0;
+byte ShiftRegisterZustand = 255;
 
 void writeToRegister(int PinToChange, int State = -1);
 
@@ -11,7 +11,7 @@ void setup() {
   pinMode(LatchPin, OUTPUT);
   pinMode(ClockPin, OUTPUT);
   pinMode(DataPin, OUTPUT);
-  writeToRegister(0, LOW); //Alles auf LOW initialisieren
+  writeToRegister(0, HIGH); //Alles auf HIGH initialisieren
   Serial.begin(9600);
   Serial.println("reset");
 }
@@ -32,5 +32,6 @@ void writeToRegister(int PinToChange, int State) {
   digitalWrite(LatchPin, LOW);
   shiftOut(DataPin, ClockPin, MSBFIRST, ShiftRegisterZustand);
   digitalWrite(LatchPin, HIGH);
+  Serial.println(ShiftRegisterZustand);
 }
 
