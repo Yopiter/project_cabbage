@@ -16,9 +16,9 @@
 #define Hyg3 A3
 
 //Pins für Shift Register
-#define DataPin 10
-#define ClockPin 11
-#define LatchPin 12
+#define ClockPin 10
+#define LatchPin 11
+#define DataPin 12
 
 ////Pins auf Shift-Register
 //4 Pumpen zur Bewässerung, 1 Pumpe für Dünger
