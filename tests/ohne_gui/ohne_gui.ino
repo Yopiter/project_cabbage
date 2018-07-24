@@ -284,7 +284,7 @@ void initiatePins() {
   pinMode(LatchPin, OUTPUT);
   pinMode(ClockPin, OUTPUT);
   pinMode(DataPin, OUTPUT);
-  writeToRegister(0, LOW); //Shift Register komplett auf LOW stellen
+  writeToRegister(0, HIGH); //Shift Register komplett auf HIGH stellen
 }
 
 void changeFanPower(int Differenz) {

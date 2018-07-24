@@ -1,4 +1,4 @@
-byte ShiftRegisterZustand = 0;
+byte ShiftRegisterZustand = 255;
 
 void DoPumpThings(int PumpenNummer, int Zustand) { //Bloß Umwandlung von Pumpennummer in Pinnummer des Schift Registers
   writeToRegister(PumpenNummer + 1, Zustand);

@@ -1,4 +1,4 @@
-byte ShiftRegisterZustand = 0;
+byte ShiftRegisterZustand = 255;
 
 void DoPumpThings(int PumpenNummer, int Zustand) { //Bloß Umwandlung von Pumpennummer in Pinnummer des Schift Registers
   constrain(PumpenNummer, 0, 3);  //Nur für Wasserpumpen (Pin 1-4)
