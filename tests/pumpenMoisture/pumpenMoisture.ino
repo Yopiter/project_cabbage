@@ -24,7 +24,14 @@
 #define PUMP1 2
 #define PUMP2 3
 #define PUMP3 4
+//Pumpen-Pins auf Mega 2560
+#define PUMP_FERT_M 22
+#define PUMP0_M 23 //Pumpe für Gebiet 0
+#define PUMP1_M 24
+#define PUMP2_M 25
+#define PUMP3_M 26
 
+#define PIN_WATER 27
 ////Shift Register End
 
 ///////////////// Fehlerzustände
@@ -44,7 +51,7 @@
 #define DELAY_NORMAL 2000 //Wartezeit zwischen Zyklen
 #define MIN_MOISTURE 700 //Maximaler Widerstandswert der Hygrometer -> minimaler Feuchte-Zustand des Bodens
 #define MAX_MOISTURE 230 //Minimnaler Widerstandswert, dann Warnung
-#define PUMP_TIME 3 //Zeit, in der die Pumpen arbeiten, wenn der boden trocken ist. //TODO: Testen und besseren Wert finden!!
+#define PUMP_TIME 4 //Zeit, in der die Pumpen arbeiten, wenn der boden trocken ist. //TODO: Testen und besseren Wert finden!!
 
 #define MAX_FERT_PUMP 10 //Maximale Pumpdauer in s für Düngerzugabe, minimal ist 0 für kein Dünger
 #define INTERVAL_MOISTURE 100 //0,1 s warten zwischen Messungen der Bodenfeuchte
@@ -69,6 +76,7 @@ unsigned long fertFreq; //in Millisekunden
 
 int Hygros[4] = {Hyg0, Hyg1, Hyg2, Hyg3};
 int MoisturePauseZyklen[4] = {0, 0, 0, 0};
+int PumpenPins[4] = {PUMP0_M, PUMP1_M, PUMP2_M, PUMP3_M};
 
 ///////////////// Timer
 
@@ -90,6 +98,14 @@ void setup() {
 }
 
 void loop() {
+  if (digitalRead(PIN_WATER)==LOW) {
+    //Füllstandsanzeige des Topfes sagt leer
+    digitalWrite(LED_BUILTIN, HIGH);
+    delay(2000);
+    digitalWrite(LED_BUILTIN, LOW);
+    delay(2000);
+    return;
+  }
   delay(DELAY_NORMAL);
   //Dann Prüfung der Bodenfeuchten und bei Bedarf betätigen der Pumpen
   handleBodenFeuchten();
@@ -97,10 +113,10 @@ void loop() {
 }
 
 void initStandardValues() {
-  moistures[0] = moistures[1] = moistures[2] = moistures[3] = 10; //I am ashamed of this...
+  moistures[0] = moistures[1] = moistures[2] = moistures[3] = 30; //I am ashamed of this...
   fertPumpTime = 5;
   fertFreq = DEF_FERT * 60 * 60L;
-  
+
   FertTimer = Neotimer(fertFreq);
 }
 
@@ -161,9 +177,9 @@ void handleBodenFeuchten() {
     Anzeigen(Nachricht);
     if (Feuchte < moistures[i] || Feuchte <= 0) {
       //Pumpen für den Abschnitt aktivieren
-      DoPumpThings(i, PUMP_ON);
+      DoPumpThingsMega(i, PUMP_ON);
       delay(PUMP_TIME * 1000); //Warten, während die Pumpen arbeiten
-      DoPumpThings(i, PUMP_OFF);
+      DoPumpThingsMega(i, PUMP_OFF);
       MoisturePauseZyklen[i] = COOLDOWN_PUMPS;
     }
   }
@@ -174,6 +190,13 @@ void initiatePins() {
   pinMode(ClockPin, OUTPUT);
   pinMode(DataPin, OUTPUT);
   writeToRegister(0, HIGH); //Shift Register komplett auf HIGH stellen
+
+  for (int i = 0; i < 4; i++) {
+    pinMode(PumpenPins[i], OUTPUT);
+    digitalWrite(PumpenPins[i], HIGH);
+  }
+
+  pinMode(PIN_WATER, INPUT);
 }
 
 int ResistanceToMoisture(int sensorResistance) {
@@ -186,11 +209,22 @@ void handleFertilizer() {
     char Nachricht[] = "fertTimer elapsed. Start fertilizing";
     Anzeigen(Nachricht);
     //TODO: Duenger zugeben
-    DoFertPumpThings(HIGH);
+    DoFertPumpThingsMega(PUMP_ON);
     delay(fertPumpTime);
-    DoFertPumpThings(LOW);
+    DoFertPumpThingsMega(PUMP_OFF);
     FertTimer.start();
   }
+}
+
+void DoPumpThingsMega(int pumpenNummer, int Zustand) {
+  Serial.print(pumpenNummer);
+  Serial.print(" ist jetzt ");
+  Serial.print(Zustand);
+  digitalWrite(PumpenPins[pumpenNummer], Zustand);
+}
+
+void DoFertPumpThingsMega(int Zustand) {
+  digitalWrite(PUMP_FERT_M, Zustand);
 }
 
 void Anzeigen(char msg[]) {
