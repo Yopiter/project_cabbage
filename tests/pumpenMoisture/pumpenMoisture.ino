@@ -98,7 +98,7 @@ void setup() {
 }
 
 void loop() {
-  if (digitalRead(PIN_WATER)==LOW) {
+  if (!getWasserStand()) {
     //Füllstandsanzeige des Topfes sagt leer
     digitalWrite(LED_BUILTIN, HIGH);
     delay(2000);
@@ -225,6 +225,15 @@ void DoPumpThingsMega(int pumpenNummer, int Zustand) {
 
 void DoFertPumpThingsMega(int Zustand) {
   digitalWrite(PUMP_FERT_M, Zustand);
+}
+
+bool getWasserStand() {
+  if (digitalRead(PIN_WATER) == HIGH) {
+    return false;
+  }
+  else {
+    return true;
+  }
 }
 
 void Anzeigen(char msg[]) {
