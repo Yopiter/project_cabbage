@@ -100,6 +100,7 @@ void setup() {
 void loop() {
   if (!getWasserStand()) {
     //Füllstandsanzeige des Topfes sagt leer
+    Serial.println("Wasser alle!");
     digitalWrite(LED_BUILTIN, HIGH);
     delay(2000);
     digitalWrite(LED_BUILTIN, LOW);
